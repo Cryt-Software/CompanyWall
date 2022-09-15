@@ -13,7 +13,7 @@ const DEBUG_LEVEL = true
 
 
 Apify.main(async () => {
-    const { startUrls } = await Apify.getInput();
+    const { startUrls, proxyConfig } = await Apify.getInput();
 
    // OLD CODE 
     // const requestList = await Apify.openRequestList('start-urls', urls);
@@ -25,11 +25,12 @@ Apify.main(async () => {
     // const requestList = await Apify.openRequestList('start-urls', ['https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY']);
     const requestQueue = await Apify.openRequestQueue();
     // const proxyConfiguration = await Apify.createProxyConfiguration();
+    const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
 
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
-        // proxyConfiguration,
+        proxyConfiguration,
         launchContext: {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
