@@ -14,15 +14,6 @@ exports.handleStart = async ({ request, page }) => {
 
     await page.waitFor(200)
 
-
-    
-    // await page.waitForXPath("//input[contains(@id, 'OIB')]");
-
-    // let OIBInput = await page.$x("//input[contains(@id, 'OIB')]");
-    // await OIBInput[0].click({ clickCount: 3 })
-    // // await OIBInput[0].type( main.OIBs[main.OIBsIndex++] )
-    // await OIBInput[0].type('67694519791')
-    // console.log(`the oib is ${main.OIBs[main.OIBsIndex]}`)
     
 };
 

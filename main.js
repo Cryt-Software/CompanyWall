@@ -18,8 +18,8 @@ Apify.main(async () => {
    // OLD CODE 
     // const requestList = await Apify.openRequestList('start-urls', urls);
 
-    const startRequests = /** @type {Apify.RequestOptions[]} */ (await Apify.getValue('START-REQUESTS')) || [];
-    const requestList = await Apify.openRequestList('start-urls', startRequests);
+    // const {startUrls } = /** @type {Apify.RequestOptions[]} */ (await Apify.getValue('START-REQUESTS')) || [];
+    const requestList = await Apify.openRequestList('start-urls', startUrls);
 
     
     // const requestList = await Apify.openRequestList('start-urls', ['https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY']);
