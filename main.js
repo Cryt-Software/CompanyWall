@@ -8,19 +8,19 @@ const Apify = require('apify');
 const { handleStart, handleList, handleDetail } = require('./src/routes');
 
 const { utils: { log } } = Apify;
-const {OIBs} = require('./OIBtoScrap')
 
 const DEBUG_LEVEL = true
 
-exports.OIBs = OIBs 
-exports.OIBsIndex = 0
 
 Apify.main(async () => {
     const { startUrls } = await Apify.getInput();
 
     
-    // const requestList = await Apify.openRequestList('start-urls', urls);
-    const requestList = await Apify.openRequestList('start-urls', ['https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY']);
+    const requestList = await Apify.openRequestList('start-urls', urls);
+
+
+    
+    // const requestList = await Apify.openRequestList('start-urls', ['https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY']);
     const requestQueue = await Apify.openRequestQueue();
     // const proxyConfiguration = await Apify.createProxyConfiguration();
 

@@ -12,7 +12,21 @@
       "prefill": [
         { "url": "https://apify.com" }
       ]
-    }
+    },
+      "proxyConfig": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "You will need to use Apify proxy or custom proxies. Automatic proxy works very well for Google Maps.",
+            "default": {
+                "useApifyProxy": true
+            },
+            "prefill": {
+                "useApifyProxy": true
+            },
+            "editor": "proxy",
+            "sectionCaption": "Proxy settings",
+            "sectionDescription": "How the browsers will behave during the scraping process."
+        }
   },
   "required": [
     "startUrls"
