@@ -15,9 +15,11 @@ const DEBUG_LEVEL = true
 Apify.main(async () => {
     const { startUrls } = await Apify.getInput();
 
-    
-    const requestList = await Apify.openRequestList('start-urls', urls);
+   // OLD CODE 
+    // const requestList = await Apify.openRequestList('start-urls', urls);
 
+    const startRequests = /** @type {Apify.RequestOptions[]} */ (await Apify.getValue('START-REQUESTS')) || [];
+    const requestList = await Apify.openRequestList('start-urls', startRequests);
 
     
     // const requestList = await Apify.openRequestList('start-urls', ['https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY']);
