@@ -344,6 +344,13 @@ async function getFinancialData(page) {
 async function getContactDetails(page) {
     // Weird thing was you had to click on the I not the button strange anti-webscraping measure more then likely
 
+
+    //Not working will need more waits + click in the same time, and get data in one go.
+    // Click on all elements retry if errors
+    // Check if button where clicked
+    // then use same loop as directors and business information
+
+
     const xpathForTelText =
         "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'tel']";
     const xpathForTelDD =
@@ -377,7 +384,7 @@ async function getContactDetails(page) {
             console.log("There is no web button ERROR");
         } else {
             await elements[0].click();
-            await page.waitFor(400);
+            await page.waitFor(40);
             webAddress = await helperGetInnerText(page, xpathForWebDD+'//span/p' ) //TESTING
 
             //TESTING XPATH ON WEB WITH XXX TO SEE IF BUTTON WAS CLICKED OR NOT
@@ -389,30 +396,52 @@ async function getContactDetails(page) {
     } else {
         console.log("There is no Web");
     }
-    // Not sure which one to do
+    
+    let telephone = ''
+    if (isTel){
+        console.log("Telephone is listed")
+        const elements = await page.$x(xpathForTelDD + "//button//i");
+        await page.waitFor(400);
+        if (elements.length == 0) {
+            console.log("There is no Tel button ERROR");
+        } else {
+            await elements[0].click();
+            await page.waitFor(40);
+            telephone = await helperGetInnerText(page, xpathForTelDD+'//span/p' ) //TESTING
+            console.log(`The telephone is ${telephone}`)
+        }
+    
+    }else{
+        console.log("There is no telephone listed")
+    }
 
-    // try {
-    //     let response = await page.evaluate(
-    //         (span) => span.click(),
-    //         await page.$x(
-    //             "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='col-12 col-lg-6 br-1']//div[@class='d-inline']//button
-    //         )[0]
-    //     );
-    //     console.log(typeof response)
-    //     console.log(response)
+    let email = ''
+    if (isEmail){
+        console.log("Email is listed")
+        const elements = await page.$x(xpathForEmailDD + "//button//i");
+        await page.waitFor(400);
+        if (elements.length == 0) {
+            console.log("There is no email revail button ERROR");
+        } else {
+            await elements[0].click();
+            await page.waitFor(40);
+            email = await helperGetInnerText(page, xpathForEmailDD+'//span/p' ) //TESTING
+            console.log(`The email is ${email}`)
+        }
+    
+    }else{
+        console.log("There is no email listed")
+    }
 
-    // } catch (e) {
-    //     console.log(e);
-    // }
-    // let xpath =
-    //     "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='col-12 col-lg-6 br-1']//div[@class='d-inline']//button";
+    let result = {
+        email: email,
+        telephone: telephone,
+        web: web
+    }
+    console.log(result)
+    return result
+    
 
-    // // await page.click('#main-content > div:nth-child(4) > div.col-12.col-xl-6.pr-7-5.d-flex.contact-summary > section > div > div > div.col-12.col-lg-6.br-1 > div > dl > dd:nth-child(4) > div > button')
-    // // await page.waitFor(3000)
-    // // const text = await page.evaluate(() => Array.from(document.querySelectorAll('[data-test-foo4="true"]'), element => element.textContent));
-
-    // const elements = await page.$$(xpath);
-    // await elements[0].click();
 }
 
 async function handleDirectors(page) {
@@ -464,9 +493,14 @@ async function handleDirectors(page) {
                     )
                 )[0]
             );
+            //add a title text by removing name from full title
 
+            let position = fullTitle.replace(fullName, '')
+            position = position.replace(',','')
+    
             directors.push({
                 fullTitle: name,
+                position:position,
                 role: role,
                 fullName: fullName,
                 directorLink: directorLink,
