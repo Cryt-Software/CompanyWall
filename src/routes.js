@@ -12,7 +12,10 @@ exports.handleStart = async ({ request, page }) => {
     // }
 
     await page.waitFor(300);
-    // not working
+    var dateOfScrap = new Date();
+    //time to scrap
+    //date of scrap
+
 
     let url = page.url();
     console.log(url);
@@ -25,17 +28,36 @@ exports.handleStart = async ({ request, page }) => {
 
     await getContactDetails(page);
 
-    await handleBusinessName(page);
-    await handleMainBusinessDetails(page);
-    await handleDirectors(page);
-    await handleBusinessDetails(page);
-    await getFinancialData(page);
-    await handleBusinessAddress(page);
-    await handleBusinessName(page);
-    await handleBusinessSummary(page);
+    let businessName = await handleBusinessName(page);
+    let businessCoreDetails = await handleMainBusinessDetails(page);
+    let directors = await handleDirectors(page);
+    let businessDetails =  await handleBusinessDetails(page);
+    let businessfinancials =  await getFinancialData(page);
+    let businessAddress = await handleBusinessAddress(page);
+    let businessSummary = await handleBusinessSummary(page);
 
     await page.waitFor(30000);
+
+    let returnObj = {
+        Name: businessName,
+        Address: businessAddress,
+        Directors: directors,
+        BasicInformation:businessDetails,
+        Financials:businessfinancials,
+        AuditorBrief:businessSummary,
+        OIB: businessCoreDetails.OIB,
+        MBS: businessCoreDetails.MBS,
+        RegisterDate: businessCoreDetails.dataOfRegister,
+        DateScraped:dateOfScrap.toString(),
+        TimeToScrap: new Date() - dateOfScrap,
+        Url: page.url()
+    }   
+    console.log('-----------------------------Full object coming ---------------------------')
+    console.log(returnObj) 
+
+
 };
+
 
 exports.handleList = async ({ request, page }) => {
     // Handle pagination
@@ -352,6 +374,7 @@ async function getFinancialData(page) {
     }
     let result = { 2019: result2019, 2020: result2020, 2021: result2021 };
     console.log(result);
+    return result
 }
 
 async function getContactDetails(page) {
