@@ -18,15 +18,15 @@ exports.handleStart = async ({ request, page }) => {
     //     return;
     // }
 
-    // await getContactDetails(page);
-    await handleBusinessName(page);
-    await handleMainBusinessDetails(page);
-    await handleDirectors(page);
-    await handleBusinessDetails(page);
-    await getFinancialData(page);
-    await handleBusinessAddress(page);
-    await handleBusinessName(page);
-    await handleBusinessSummary(page);
+    await getContactDetails(page);
+    // await handleBusinessName(page);
+    // await handleMainBusinessDetails(page);
+    // await handleDirectors(page);
+    // await handleBusinessDetails(page);
+    // await getFinancialData(page);
+    // await handleBusinessAddress(page);
+    // await handleBusinessName(page);
+    // await handleBusinessSummary(page);
 };
 
 exports.handleList = async ({ request, page }) => {
@@ -141,9 +141,9 @@ async function handleMainBusinessDetails(page) {
 }
 
 async function helperGetInnerText(page, xpath) {
-    let text = ''
+    let text = "";
     try {
-         text= await page.evaluate(
+        text = await page.evaluate(
             (a) => a.innerText,
             (
                 await page.$x(xpath)
@@ -342,6 +342,53 @@ async function getFinancialData(page) {
 }
 
 async function getContactDetails(page) {
+    // Weird thing was you had to click on the I not the button strange anti-webscraping measure more then likely
+
+    const xpathForTelText =
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'tel']";
+    const xpathForTelDD =
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'tel']/following-sibling::dd";
+
+    const xpathForEmailText =
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'email']";
+    const xpathForEmailDD =
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'email']/following-sibling::dd";
+
+    const xpathForWebText =
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'web']";
+    const xpathForWebDD =
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'web']/following-sibling::dd";
+
+    let TelEle = await page.$x(xpathForTelText);
+    let emailEle = await page.$x(xpathForEmailText);
+    let webEle = await page.$x(xpathForWebText);
+
+    let isTel = !(TelEle.length == 0);
+    let isWeb = !(webEle.length == 0);
+    let isEmail = !(emailEle.length == 0);
+
+    let webAddress = ''
+    if (isWeb) {
+        console.log("There is web listed");
+
+        const elements = await page.$x(xpathForWebDD + "//button//i");
+        await page.waitFor(400);
+        if (elements.length == 0) {
+            console.log("There is no web button ERROR");
+        } else {
+            await elements[0].click();
+            await page.waitFor(400);
+            webAddress = await helperGetInnerText(page, xpathForWebDD+'//span/p' ) //TESTING
+
+            //TESTING XPATH ON WEB WITH XXX TO SEE IF BUTTON WAS CLICKED OR NOT
+            let testText = await helperGetInnerText(page, '//*[@id="main-content"]/div[3]/div[1]/section/div/div/div[1]/div/dl/dd[3]/div/span')
+            console.log(`the test text is ${testText} `)
+
+            console.log(`The website is ${webAddress}`)
+        }
+    } else {
+        console.log("There is no Web");
+    }
     // Not sure which one to do
 
     // try {
@@ -357,28 +404,17 @@ async function getContactDetails(page) {
     // } catch (e) {
     //     console.log(e);
     // }
-    let xpath =
-        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='col-12 col-lg-6 br-1']//div[@class='d-inline']//button";
+    // let xpath =
+    //     "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='col-12 col-lg-6 br-1']//div[@class='d-inline']//button";
 
-    // await page.click('#main-content > div:nth-child(4) > div.col-12.col-xl-6.pr-7-5.d-flex.contact-summary > section > div > div > div.col-12.col-lg-6.br-1 > div > dl > dd:nth-child(4) > div > button')
-    // await page.waitFor(3000)
-    // const text = await page.evaluate(() => Array.from(document.querySelectorAll('[data-test-foo4="true"]'), element => element.textContent));
+    // // await page.click('#main-content > div:nth-child(4) > div.col-12.col-xl-6.pr-7-5.d-flex.contact-summary > section > div > div > div.col-12.col-lg-6.br-1 > div > dl > dd:nth-child(4) > div > button')
+    // // await page.waitFor(3000)
+    // // const text = await page.evaluate(() => Array.from(document.querySelectorAll('[data-test-foo4="true"]'), element => element.textContent));
 
-    const elements = await page.$$(xpath);
-    await elements[0].click();
+    // const elements = await page.$$(xpath);
+    // await elements[0].click();
 }
 
-// TODO needs a bit of work
-//and get links for directors
-
-/*
-[
-  { 'Žarko Šepetavc (NP), jedini osnivač d.o.o.': 'Vlasnik' },
-  { 'Žarko Šepetavc prokurist': 'Zastupnik' },
-  { 'Snježana Šepetavc direktor': 'Zastupnik' }
-]
-
-*/
 async function handleDirectors(page) {
     let dt = await page.$x(
         '//section/header/div/h3[contains(text(),"Kontakti")]/parent::div/parent::header/parent::section//div[@class="row"]/div[2]/div/dl/dt'
@@ -403,6 +439,22 @@ async function handleDirectors(page) {
                     )
                 )[0]
             );
+            let fullName = await page.evaluate(
+                (a) => a.innerText,
+                (
+                    await page.$x(
+                        `//section/header/div/h3[contains(text(),"Kontakti")]/parent::div/parent::header/parent::section//div[@class="row"]/div[2]/div/dl/dd[${i}]/a`
+                    )
+                )[0]
+            );
+            let directorLink = await page.evaluate(
+                (a) => a.href,
+                (
+                    await page.$x(
+                        `//section/header/div/h3[contains(text(),"Kontakti")]/parent::div/parent::header/parent::section//div[@class="row"]/div[2]/div/dl/dd[${i}]/a`
+                    )
+                )[0]
+            );
 
             let role = await page.evaluate(
                 (a) => a.innerText,
@@ -412,7 +464,13 @@ async function handleDirectors(page) {
                     )
                 )[0]
             );
-            directors.push({ [name]: role });
+
+            directors.push({
+                fullTitle: name,
+                role: role,
+                fullName: fullName,
+                directorLink: directorLink,
+            });
             // log.info(name);
             // log.info(role);
         } catch (e) {
