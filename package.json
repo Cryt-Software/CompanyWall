@@ -4,6 +4,7 @@
 	"description": "This is a boilerplate of an Apify actor.",
 	"dependencies": {
 		"apify": "^2.3.2",
+		"mongodb": "4.9",
 		"puppeteer": "*"
 	},
 	"devDependencies": {
