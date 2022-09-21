@@ -5,6 +5,27 @@ const {
 } = Apify;
 const main = require("../main");
 
+const DEBUG = true;
+const DEBUG_LEVEL = 1;
+
+function logInfo(message, levelOfImportance, error = false) {
+    if (levelOfImportance <= DEBUG_LEVEL && DEBUG) {
+        if (error) {
+            console.error(message);
+        } else {
+            console.log(message);
+        }
+    }
+}
+
+exports.handleDirector = async ({ request, page }) => {
+    // ensure that the same name is not scraped twice aka tomislav that is a owner and a directory no need to scrap twice
+    // Handle details
+    let pastCompanies = await handleDirectorPastCompanies(page);
+    let pastCompanyStats = await handleDirectoryOtherCompaniesStats(page);
+    return { pastCompanies: pastCompanies, pastCompanyStats: pastCompanies };
+};
+
 exports.handleStart = async ({ request, page }) => {
     // Handle Start URLs
     // if(main.OIBsIndex > main.OIBs.length) {
@@ -15,7 +36,6 @@ exports.handleStart = async ({ request, page }) => {
     var dateOfScrap = new Date();
     //time to scrap
     //date of scrap
-
 
     let url = page.url();
     console.log(url);
@@ -31,8 +51,8 @@ exports.handleStart = async ({ request, page }) => {
     let businessName = await handleBusinessName(page);
     let businessCoreDetails = await handleMainBusinessDetails(page);
     let directors = await handleDirectors(page);
-    let businessDetails =  await handleBusinessDetails(page);
-    let businessfinancials =  await getFinancialData(page);
+    let businessDetails = await handleBusinessDetails(page);
+    let businessfinancials = await getFinancialData(page);
     let businessAddress = await handleBusinessAddress(page);
     let businessSummary = await handleBusinessSummary(page);
 
@@ -42,22 +62,21 @@ exports.handleStart = async ({ request, page }) => {
         Name: businessName,
         Address: businessAddress,
         Directors: directors,
-        BasicInformation:businessDetails,
-        Financials:businessfinancials,
-        AuditorBrief:businessSummary,
+        BasicInformation: businessDetails,
+        Financials: businessfinancials,
+        AuditorBrief: businessSummary,
         OIB: businessCoreDetails.OIB,
         MBS: businessCoreDetails.MBS,
         RegisterDate: businessCoreDetails.dataOfRegister,
-        DateScraped:dateOfScrap.toString(),
+        DateScraped: dateOfScrap.toString(),
         TimeToScrap: new Date() - dateOfScrap,
-        Url: page.url()
-    }   
-    console.log('-----------------------------Full object coming ---------------------------')
-    console.log(returnObj) 
-
-
+        Url: page.url(),
+    };
+    console.log(
+        "-----------------------------Full object coming ---------------------------"
+    );
+    console.log(returnObj);
 };
-
 
 exports.handleList = async ({ request, page }) => {
     // Handle pagination
@@ -67,12 +86,112 @@ exports.handleDetail = async ({ request, page }) => {
     // Handle details
 };
 
+//this gets the stats of the directory such as how many companies he as been part of etc
+async function handleDirectoryOtherCompaniesStats(page) {
+    let currentActiveInCompanies = await helperGetInnerText(
+        page,
+        "//h6[text()='Trenutno aktivan u']/following-sibling::span[1]"
+    );
+    let wasActiveInCompanies = await helperGetInnerText(
+        page,
+        "//h6[text()='Bio aktivan u']/following-sibling::span[1]"
+    );
+    let connectToXCompanies = await helperGetInnerText(
+        page,
+        "//h6[text()='Povezanih']/following-sibling::span[1]"
+    );
+
+    return {
+        currentActiveInCompanies: currentActiveInCompanies,
+        wasActiveInCompanies: wasActiveInCompanies,
+        connectToXCompanies: connectToXCompanies,
+    };
+}
+
+// This is used on the specifc information page for people connect to the company
+async function handleDirectorPastCompanies(page) {
+    const xpathIme = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Ime"]`;
+    const xpathStatus = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Status"]`;
+    const xpathOIB = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="OIB"]`;
+    const xpathAdresa = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Adresa"]`;
+    const xpathPozicija = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Pozicija"]`;
+    const xpathod = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="od"]`;
+    const xpathdo = (i) =>
+        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="do"]`;
+
+    const XpathDataValueRows = '//table[@id="ativityInCompany"]/tbody/tr';
+
+    let rowsEle = await page.$x(XpathDataValueRows);
+    if (rowsEle.length == 0) {
+        logInfo("No info on past companies", 1);
+        return {};
+    } else {
+        logInfo("There is info on past companies by director data");
+    }
+
+    logInfo(`There are ${rowsEle.length} amount of rows`);
+
+    let Ime = "";
+    let Status = "";
+    let OIB = "";
+    let Adresa = "";
+    let Pozicija = "";
+    let od = "";
+    let doDate = "";
+
+    let companies = [];
+    for (let i = 1; i < rowsEle.length + 1; i++) {
+        Ime = await helperGetInnerText(page, xpathIme(i));
+        Status = await helperGetInnerText(page, xpathStatus(i));
+        OIB = await helperGetInnerText(page, xpathOIB(i));
+        Adresa = await helperGetInnerText(page, xpathAdresa(i));
+        Pozicija = await helperGetInnerText(page, xpathPozicija(i));
+        od = await helperGetInnerText(page, xpathod(i));
+        doDate = await helperGetInnerText(page, xpathdo(i));
+        let linkToCompany = "";
+        try {
+            linkToCompany = await page.evaluate(
+                (a) => a.href,
+                (
+                    await page.$x(xpathIme(i) + "/a")
+                )[0]
+            );
+        } catch (e) {
+            console.log("failed at link for company directory had ties with");
+        }
+
+        obj = {
+            Ime: Ime,
+            Status: Status,
+            OIB: OIB,
+            Adresa: Adresa,
+            Pozicija: Pozicija,
+            od: od,
+            linkToCompany: linkToCompany,
+            do: doDate,
+        };
+        companies.push(obj);
+    }
+
+    console.log(companies);
+    return companies;
+}
+
 async function handleBankDetails(page) {
     //Računi i blokade
     //check if there
     // check other company wall to see if works
 }
 
+//This get rough information on business summary and is always differnet
+// Could improve by using same technique matching <dt> and <dd> values
+// Also by using the helper function to get text would make it look clear
 async function handleBusinessSummary(page) {
     console.log("handleBusinessSummary called");
 
@@ -113,6 +232,7 @@ async function handleBusinessSummary(page) {
     return businessData;
 }
 
+// Simply gets the business name
 async function handleBusinessName(page) {
     let name = await helperGetInnerText(page, "//h1");
     console.log(`The business name is ${name}`);
@@ -121,6 +241,7 @@ async function handleBusinessName(page) {
     };
 }
 
+// Get the business address
 async function handleBusinessAddress(page) {
     let fullAddress = await helperGetInnerText(
         page,
@@ -148,6 +269,7 @@ async function handleBusinessAddress(page) {
     return a;
 }
 
+// Get concert data on the company such as OIB and MBS and date of register that isnt always there
 async function handleMainBusinessDetails(page) {
     let OIB = await helperGetInnerText(
         page,
@@ -170,6 +292,7 @@ async function handleMainBusinessDetails(page) {
     return a;
 }
 
+// used to get text with xpath
 async function helperGetInnerText(page, xpath) {
     let text = "";
     try {
@@ -185,6 +308,9 @@ async function helperGetInnerText(page, xpath) {
     return text;
 }
 
+// This function checks to see if the register or login page was given meaning we need
+// to swtich proxy, This hasn't been implemented yet
+// TODO IMPLEMENT NEW PROXY AND FINGERPRINT WHEN True
 async function checkForRegisterPage(page) {
     try {
         let title = await helperGetInnerText(
@@ -214,6 +340,7 @@ async function checkForRegisterPage(page) {
     return false;
 }
 
+// Handles business details that is mostly used by auditors such as their tax returns been paid properly
 async function handleBusinessDetails(page) {
     // data comes in flat array of even size, with odd numbers being identifer and even being data
     console.log("handleBusinessPage called");
@@ -255,6 +382,7 @@ async function handleBusinessDetails(page) {
     return businessData;
 }
 
+//Gets financial data on the company in the forum on a table
 async function getFinancialData(page) {
     const tableXpath =
         '//section/header/div/h3[contains(text(),"Financijski sažetak")]/parent::div/parent::header/parent::section//table[@class="table table-striped no-border table-sm company-summary-table"]';
@@ -374,9 +502,12 @@ async function getFinancialData(page) {
     }
     let result = { 2019: result2019, 2020: result2020, 2021: result2021 };
     console.log(result);
-    return result
+    return res;
 }
 
+// Tries to scrap Telephone, email and web address if present by clicking on show button
+// Waiting a bit, waiting for xpath and then extracting that info
+// This takes far too long almost 30 seconds should be reduced
 async function getContactDetails(page) {
     // Weird thing was you had to click on the I not the button strange anti-webscraping measure more then likely
 
@@ -440,7 +571,7 @@ async function getContactDetails(page) {
     //     console.log("There is no telephone listed");
     // }
 
-        let telephone = "";
+    let telephone = "";
     try {
         if (isTel) {
             console.log("Telephone is listed");
@@ -472,7 +603,7 @@ async function getContactDetails(page) {
         );
     }
 
-       let email = "";
+    let email = "";
     try {
         if (isEmail) {
             console.log("Email is listed");
@@ -503,7 +634,7 @@ async function getContactDetails(page) {
         );
     }
 
-        let webAddress = "";
+    let webAddress = "";
     try {
         if (isWeb) {
             console.log("There is web listed");
@@ -592,6 +723,8 @@ async function getContactDetails(page) {
     return result;
 }
 
+//This gets the directors and their links to their specific pages
+// TODO get unqie named directors and send their link to request queue
 async function handleDirectors(page) {
     let dt = await page.$x(
         '//section/header/div/h3[contains(text(),"Kontakti")]/parent::div/parent::header/parent::section//div[@class="row"]/div[2]/div/dl/dt'
