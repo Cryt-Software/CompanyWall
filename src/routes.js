@@ -13,20 +13,29 @@ exports.handleStart = async ({ request, page }) => {
 
     await page.waitFor(300);
     // not working
-    // if (checkForRegisterPage(page)) {
-    //     console.error("it is register page");
-    //     return;
-    // }
+
+    let url = page.url();
+    console.log(url);
+    if (await checkForRegisterPage(page)) {
+        console.error("it is register page");
+        return; // this needs to be use new proxy
+    } else {
+        console.log("Not register page");
+    }
 
     await getContactDetails(page);
-    // await handleBusinessName(page);
-    // await handleMainBusinessDetails(page);
-    // await handleDirectors(page);
-    // await handleBusinessDetails(page);
-    // await getFinancialData(page);
-    // await handleBusinessAddress(page);
-    // await handleBusinessName(page);
-    // await handleBusinessSummary(page);
+
+    await handleBusinessName(page);
+    await handleMainBusinessDetails(page);
+    await handleDirectors(page);
+    await handleBusinessDetails(page);
+    await getFinancialData(page);
+    await handleBusinessAddress(page);
+    await handleBusinessName(page);
+    await handleBusinessSummary(page);
+
+
+    await page.waitFor(30000)
 };
 
 exports.handleList = async ({ request, page }) => {
@@ -157,15 +166,16 @@ async function helperGetInnerText(page, xpath) {
 
 async function checkForRegisterPage(page) {
     try {
-        element = await page.waitForSelector(
-            "#main-content > div > div.col.pr-7-5 > section > header > div > h3"
+        let title = await helperGetInnerText(
+            page,
+            '//*[@id="main-content"]/div/div[1]/section/header/div/h3'
         );
-
-        title = await page.evaluate((element) => element.textContent, element);
 
         if (title == "Registrirajte se za besplatan pristup") {
             console.log("the title is true");
             return true;
+        } else {
+            console.log("Title is not the same");
         }
     } catch (e) {
         console.log("error getting title");
@@ -173,6 +183,10 @@ async function checkForRegisterPage(page) {
 
     if (page.url() == "https://www.companywall.hr/Account/RegisterOpenUser") {
         console.log("the page url is true");
+        return true;
+    }
+    if(page.url() == "https://www.companywall.hr/Account/Login") {
+        console.log("Asking for login page, failed need new proxy");
         return true;
     }
 
@@ -344,27 +358,34 @@ async function getFinancialData(page) {
 async function getContactDetails(page) {
     // Weird thing was you had to click on the I not the button strange anti-webscraping measure more then likely
 
-
     //Not working will need more waits + click in the same time, and get data in one go.
     // Click on all elements retry if errors
     // Check if button where clicked
     // then use same loop as directors and business information
 
+    // Add in catch e -> with tracking
+
+
+    // Need to have better wait function or wait until function
+
+    // also add error handling for when the tel/web is show but not picked up by script
+
+
 
     const xpathForTelText =
         "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'tel']";
     const xpathForTelDD =
-        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'tel']/following-sibling::dd";
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'tel']/following-sibling::dd[1]";
 
     const xpathForEmailText =
         "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'email']";
     const xpathForEmailDD =
-        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'email']/following-sibling::dd";
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'email']/following-sibling::dd[1]";
 
     const xpathForWebText =
         "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'web']";
     const xpathForWebDD =
-        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'web']/following-sibling::dd";
+        "//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = 'web']/following-sibling::dd[1]";
 
     let TelEle = await page.$x(xpathForTelText);
     let emailEle = await page.$x(xpathForEmailText);
@@ -372,9 +393,81 @@ async function getContactDetails(page) {
 
     let isTel = !(TelEle.length == 0);
     let isWeb = !(webEle.length == 0);
-    let isEmail = !(emailEle.length == 0);
+    let isEmail = !(emailEle.length == 0)
 
-    let webAddress = ''
+    const extractValueFromSpan = (type) => `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]/div/span`
+
+    const buttonXpaath = (type) => `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]//button//i`
+
+
+
+
+    // let telephone = "";
+    // if (isTel) {
+    //     console.log("Telephone is listed");
+    //     const elements = await page.$x(xpathForTelDD + "//button//i");
+    //     await page.waitFor(400);
+    //     if (elements.length == 0) {
+    //         console.log("There is no Tel button ERROR");
+    //     } else {
+    //         await elements[0].click();
+    //         await page.waitFor(300);
+    //         telephone = await helperGetInnerText(
+    //             page,
+    //             xpathForTelDD + "/div/span"
+    //         ); //TESTING
+    //         console.log(`The telephone is ${telephone}`);
+    //     }
+    // } else {
+    //     console.log("There is no telephone listed");
+    // }
+
+
+    let telephone = "";
+    if (isTel) {
+        console.log("Telephone is listed");
+        const elements = await page.$x(xpathForTelDD + "//button//i");
+        await page.waitFor(400);
+        if (elements.length == 0) {
+            console.log("There is no Tel button ERROR");
+        } else {
+            await elements[0].click();
+            await page.waitFor(300);
+            await page.waitFor(xpathForTelDD+"/div/span",{timeout:2000})
+            telephone = await helperGetInnerText(
+                page,
+                xpathForTelDD + "/div/span"
+            ); //TESTING
+            console.log(`The telephone is ${telephone}`);
+        }
+    } else {
+        console.log("There is no telephone listed");
+    }
+
+
+
+    let email = "";
+    if (isEmail) {
+        console.log("Email is listed");
+        const elements = await page.$x(xpathForEmailDD + "//button//i");
+        await page.waitFor(400);
+        if (elements.length == 0) {
+            console.log("There is no email revail button ERROR");
+        } else {
+            await elements[0].click();
+            await page.waitFor(400);
+            await page.waitFor(xpathForEmailDD+"/div/span",{timeout:2000})
+            email = await helperGetInnerText(
+                page,
+                xpathForEmailDD + "//span/p"
+            ); //TESTING
+            console.log(`The email is ${email}`);
+        }
+    } else {
+        console.log("There is no email listed");
+    }
+
+    let webAddress = "";
     if (isWeb) {
         console.log("There is web listed");
 
@@ -384,64 +477,33 @@ async function getContactDetails(page) {
             console.log("There is no web button ERROR");
         } else {
             await elements[0].click();
-            await page.waitFor(40);
-            webAddress = await helperGetInnerText(page, xpathForWebDD+'//span/p' ) //TESTING
+            await page.waitFor(300);
+            await page.waitFor(xpathForWebDD+"/div/span",{timeout:2000})
+            webAddress = await helperGetInnerText(
+                page,
+                xpathForWebDD + "/div/span/p"
+            ); //TESTING
 
             //TESTING XPATH ON WEB WITH XXX TO SEE IF BUTTON WAS CLICKED OR NOT
-            let testText = await helperGetInnerText(page, '//*[@id="main-content"]/div[3]/div[1]/section/div/div/div[1]/div/dl/dd[3]/div/span')
-            console.log(`the test text is ${testText} `)
+            let testText = await helperGetInnerText(
+                page,
+                '//*[@id="main-content"]/div[3]/div[1]/section/div/div/div[1]/div/dl/dd[3]/div/span'
+            );
+            console.log(`the test text is ${testText} `);
 
-            console.log(`The website is ${webAddress}`)
+            console.log(`The website is ${webAddress}`);
         }
     } else {
         console.log("There is no Web");
-    }
-    
-    let telephone = ''
-    if (isTel){
-        console.log("Telephone is listed")
-        const elements = await page.$x(xpathForTelDD + "//button//i");
-        await page.waitFor(400);
-        if (elements.length == 0) {
-            console.log("There is no Tel button ERROR");
-        } else {
-            await elements[0].click();
-            await page.waitFor(40);
-            telephone = await helperGetInnerText(page, xpathForTelDD+'//span/p' ) //TESTING
-            console.log(`The telephone is ${telephone}`)
-        }
-    
-    }else{
-        console.log("There is no telephone listed")
-    }
-
-    let email = ''
-    if (isEmail){
-        console.log("Email is listed")
-        const elements = await page.$x(xpathForEmailDD + "//button//i");
-        await page.waitFor(400);
-        if (elements.length == 0) {
-            console.log("There is no email revail button ERROR");
-        } else {
-            await elements[0].click();
-            await page.waitFor(40);
-            email = await helperGetInnerText(page, xpathForEmailDD+'//span/p' ) //TESTING
-            console.log(`The email is ${email}`)
-        }
-    
-    }else{
-        console.log("There is no email listed")
     }
 
     let result = {
         email: email,
         telephone: telephone,
-        web: web
-    }
-    console.log(result)
-    return result
-    
-
+        web: webAddress,
+    };
+    console.log(result);
+    return result;
 }
 
 async function handleDirectors(page) {
@@ -495,12 +557,12 @@ async function handleDirectors(page) {
             );
             //add a title text by removing name from full title
 
-            let position = fullTitle.replace(fullName, '')
-            position = position.replace(',','')
-    
+            let position = name.replace(fullName, "");
+            position = position.replace(",", "");
+
             directors.push({
                 fullTitle: name,
-                position:position,
+                position: position,
                 role: role,
                 fullName: fullName,
                 directorLink: directorLink,
