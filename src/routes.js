@@ -6,7 +6,9 @@ const {
 const main = require("../main");
 
 const DEBUG = true;
-const DEBUG_LEVEL = 1;
+const DEBUG_LEVEL = 3;
+
+// let mongo = main.mongo
 
 function logInfo(message, levelOfImportance, error = false) {
     if (levelOfImportance <= DEBUG_LEVEL && DEBUG) {
@@ -21,21 +23,49 @@ function logInfo(message, levelOfImportance, error = false) {
 exports.handleDirector = async ({ request, page }) => {
     // ensure that the same name is not scraped twice aka tomislav that is a owner and a directory no need to scrap twice
     // Handle details
+    console.log("--------------------- Handle director ----------------------");
+    let url = page.url();
+    console.log(url);
+    let name = request.userData.name;
+    // if (typeof name !== 'undefined'){
+    //     name = '';
+    // }
+    console.log(`THIS IS THE NAME FROM request labels ${name}`);
+
+    var dateOfScrap = new Date();
+    if (await checkForRegisterPage(page)) {
+        console.error("it is register page");
+        return; // this needs to be use new proxy
+    } else {
+        console.log("Not register page");
+    }
     let pastCompanies = await handleDirectorPastCompanies(page);
     let pastCompanyStats = await handleDirectoryOtherCompaniesStats(page);
-    return { pastCompanies: pastCompanies, pastCompanyStats: pastCompanies };
+    let returnObj = {
+        pastCompanies: pastCompanies,
+        pastCompanyStats: pastCompanies,
+        pastCompanyStats:pastCompanyStats,
+        url: url,
+        dateOfScrap,
+        name,
+        Type: 'Directory breakdown'
+    };
+    console.log(
+        "======================================= DIrector final data==============="
+    );
+    // console.log(returnObj)
+    console.log(
+        "-------------------- END OF DIRECTORY DATA --------------------"
+    );
+
+    await main.mongo.insert(returnObj);
+
+    return returnObj;
 };
 
-exports.handleStart = async ({ request, page }) => {
-    // Handle Start URLs
-    // if(main.OIBsIndex > main.OIBs.length) {
-    // return;
-    // }
-
+exports.handleStart = async ({ request, page }, requestQueue) => {
     await page.waitFor(300);
     var dateOfScrap = new Date();
-    //time to scrap
-    //date of scrap
 
     let url = page.url();
     console.log(url);
@@ -56,7 +86,20 @@ exports.handleStart = async ({ request, page }) => {
     let businessAddress = await handleBusinessAddress(page);
     let businessSummary = await handleBusinessSummary(page);
 
+    for (let i = 0; i < directors.length; i++) {
+        //TODO MAKE SURE THAT WE ARE NOT SCRAPING THE SAME DIRECTORS OVER AND OVER AGAIN CHECK THEIR NAME
+        // MAKE A LIST OF ALL THE OBJECTS WITH UNIQUE NAMES
+        const name = directors[i].fullName;
+        const link = directors[i].directorLink;
+
+        requestQueue.addRequest({
+            url: link,
+            userData: { label: "DIRECTOR_PAST_COMPANIES", name: name },
+        });
+    }
+
     await page.waitFor(30000);
+    // List scrap a director based on link given
 
     let returnObj = {
         Name: businessName,
@@ -70,12 +113,18 @@ exports.handleStart = async ({ request, page }) => {
         RegisterDate: businessCoreDetails.dataOfRegister,
         DateScraped: dateOfScrap.toString(),
         TimeToScrap: new Date() - dateOfScrap,
+        Type: "company business overview",
         Url: page.url(),
     };
     console.log(
         "-----------------------------Full object coming ---------------------------"
     );
-    console.log(returnObj);
+
+    // console.log(returnObj);
+
+    await main.mongo.insert(returnObj);
+
+    return returnObj;
 };
 
 exports.handleList = async ({ request, page }) => {
@@ -110,22 +159,33 @@ async function handleDirectoryOtherCompaniesStats(page) {
 
 // This is used on the specifc information page for people connect to the company
 async function handleDirectorPastCompanies(page) {
-    const xpathIme = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Ime"]`;
-    const xpathStatus = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Status"]`;
-    const xpathOIB = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="OIB"]`;
-    const xpathAdresa = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Adresa"]`;
-    const xpathPozicija = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Pozicija"]`;
-    const xpathod = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="od"]`;
-    const xpathdo = (i) =>
-        `//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="do"]`;
+    /*
+TODO
+Related companies
+Povezane tvrtke
 
-    const XpathDataValueRows = '//table[@id="ativityInCompany"]/tbody/tr';
+//section/header/div/h3[contains(text(),"Povezane tvrtke")]/parent::div/parent::header/parent::section
+All we have to do is change the section text selector to "Povezane tvrtke" and the function for past companies
+works almost the same for related companies
+*/
+
+    const xpathIme = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/th[@data-title="Ime"]`;
+    const xpathStatus = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Status"]`;
+    const xpathOIB = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="OIB"]`;
+    const xpathAdresa = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Adresa"]`;
+    const xpathPozicija = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="Pozicija"]`;
+    const xpathod = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="od"]`;
+    const xpathdo = (i) =>
+        `//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr[${i}]/td[@data-title="do"]`;
+
+    const XpathDataValueRows =
+        '//section/header/div/h3[contains(text(),"Aktivnost osobe u tvrtkama")]/parent::div/parent::header/parent::section//table[@id="ativityInCompany"]/tbody/tr';
 
     let rowsEle = await page.$x(XpathDataValueRows);
     if (rowsEle.length == 0) {
@@ -163,6 +223,7 @@ async function handleDirectorPastCompanies(page) {
                 )[0]
             );
         } catch (e) {
+            console.error(e);
             console.log("failed at link for company directory had ties with");
         }
 
@@ -179,10 +240,11 @@ async function handleDirectorPastCompanies(page) {
         companies.push(obj);
     }
 
-    console.log(companies);
+    console.log(companies[1]);
     return companies;
 }
 
+//TODO will implement
 async function handleBankDetails(page) {
     //Računi i blokade
     //check if there
@@ -312,6 +374,15 @@ async function helperGetInnerText(page, xpath) {
 // to swtich proxy, This hasn't been implemented yet
 // TODO IMPLEMENT NEW PROXY AND FINGERPRINT WHEN True
 async function checkForRegisterPage(page) {
+    if (page.url() == "https://www.companywall.hr/Account/RegisterOpenUser") {
+        console.log("the page url is true");
+        return true;
+    }
+    if (page.url() == "https://www.companywall.hr/Account/Login") {
+        console.log("Asking for login page, failed need new proxy");
+        return true;
+    }
+
     try {
         let title = await helperGetInnerText(
             page,
@@ -326,15 +397,6 @@ async function checkForRegisterPage(page) {
         }
     } catch (e) {
         console.log("error getting title");
-    }
-
-    if (page.url() == "https://www.companywall.hr/Account/RegisterOpenUser") {
-        console.log("the page url is true");
-        return true;
-    }
-    if (page.url() == "https://www.companywall.hr/Account/Login") {
-        console.log("Asking for login page, failed need new proxy");
-        return true;
     }
 
     return false;
@@ -502,7 +564,7 @@ async function getFinancialData(page) {
     }
     let result = { 2019: result2019, 2020: result2020, 2021: result2021 };
     console.log(result);
-    return res;
+    return result;
 }
 
 // Tries to scrap Telephone, email and web address if present by clicking on show button

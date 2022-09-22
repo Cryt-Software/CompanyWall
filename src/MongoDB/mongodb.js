@@ -5,25 +5,33 @@ const MONGODB = 'test'
 
 
 
-exports.module = class Mongo {
+class Mongo {
 
     error = false
-    
+    // client = null
+    // collection = null
+    // database = null
 
      constructor() {
             // await this.connect()
-            console.log()
+            console.log('connect to mongoDB')
+            this.connect()
      }
 
-    async connect() {
+    connect() {
 
         this.client = new MongoClient(MONGOURL);
-        const database = client.db('test');
+        const database = this.client.db('test');
         this.collection = database.collection('CompanyWall');
     } 
 
+    info(){
+        return this.collection.MONGOURL
+    }
+    
     async insert(Object){
-        await this.collection.insertOne(Object)   
+        let result =  await this.collection.insertOne(Object)   
+        console.log(result) 
     }
 
     close(){
@@ -31,3 +39,4 @@ exports.module = class Mongo {
     }
 
 }
+module.exports = Mongo

@@ -4,65 +4,44 @@
  * If you're looking for examples or want to learn more, see README.
  */
 
-const Apify = require('apify');
-const { handleStart, handleList, handleDetail } = require('./src/routes');
+const Apify = require("apify");
+const {
+    handleStart,
+    handleList,
+    handleDetail,
+    handleDirector,
+} = require("./src/routes");
+const Mongo = require("./src/MongoDB/mongodb.js");
+const {
+    extendConfigJSON,
+} = require("lighthouse/lighthouse-core/config/config");
+const {
+    utils: { log },
+} = Apify;
+const DEBUG_LEVEL = true;
 
-const { utils: { log } } = Apify;
-
-
-const DEBUG_LEVEL = true
-
-const { MongoClient } = require("mongodb");
-
-const MONGOURL = "mongodb+srv://Cryt:Skyrimrocks123@cryt.dvj2t.mongodb.net/?retryWrites=true&w=majority";
-const MONGODB = 'test'
-
-async function connect() {
-
-    this.client = new MongoClient(MONGOURL);
-    const database = client.db('test');
-    this.collection = database.collection('CompanyWall');
-} 
-
-async function insert(Object){
-    await this.collection.insertOne(Object)   
-}
-
-async function close(){
-    this.client.close();
-}
-async function startDB() {
-
-    await connect()
-    await insert({'sdf':2})
-    await close() 
-}
-
+exports.mongo = new Mongo();
 
 Apify.main(async () => {
-    const { startUrls, proxyConfig } = await Apify.getInput();
+    let input = await Apify.getInput();
 
-    await startDB();
-   // OLD CODE 
-    // const requestList = await Apify.openRequestList('start-urls', urls);
+    const { proxyConfig } = input;
+    let proxyConfiguration = proxyConfig;
+    let requestList = await handleInput(input);
 
-    // const {startUrls } = /** @type {Apify.RequestOptions[]} */ (await Apify.getValue('START-REQUESTS')) || [];
-    // const requestList = await Apify.openRequestList('start-urls', startUrls);
-
-    
-    const requestList = await Apify.openRequestList('start-urls', ['https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY']);
     const requestQueue = await Apify.openRequestQueue();
-    // const proxyConfiguration = await Apify.createProxyConfiguration();
-
-    // const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
-
 
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
-        maxRequestRetries:1,
+        maxRequestRetries: 1,
+        useSessionPool: true,
+        // Overrides default Session pool configuration
+        sessionPoolOptions: {
+            maxPoolSize: 100,
+        },
         // proxyConfiguration, // This is for local testing
-    
+
         launchContext: {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
@@ -74,22 +53,75 @@ Apify.main(async () => {
             useFingerprints: true,
         },
         handlePageFunction: async (context) => {
-            const { url, userData: { label } } = context.request;
-            log.info('Page opened.', { label, url });
+            const {
+                url,
+                userData: { label },
+            } = context.request;
+            log.info("Page opened.", { label, url });
             switch (label) {
-                case 'LIST':
+                case "LIST":
                     return handleList(context);
-                case 'DETAIL':
+                case "DETAIL":
                     return handleDetail(context);
+                case "DIRECTOR_PAST_COMPANIES":
+                    return handleDirector(context);
                 default:
-                    return handleStart(context);
+                    return handleStart(context, requestQueue);
             }
         },
     });
 
-    log.info('Starting the crawl.');
+    log.info("Starting the crawl.");
     await crawler.run();
-    log.info('Crawl finished.');
+    log.info("Crawl finished.");
 });
 
+// this is used to handle in put from apify console
+async function handleInput(input) {
+    const {
+        startUrls,
+        proxyConfig,
+        sitemap,
+        OIB,
+        OIBs,
+        MBS,
+        MBSs,
+        SearchTermSearch,
+        SearchTerms,
+    } = input;
+    if (sitemap) {
+        return await getUrlsFromSitemap(sitemapURL);
+    } else if (OIB) {
+        // scraping OIB for search
+        //TODO not implmeneted
+    } else if (MBS) {
+        // scraping MBS for search
+        //TODO not implmeneted
+    } else if (SearchTermSearch) {
+        // scraping search terms for search
+        //TODO not implmeneted
+    } else if (typeof startUrls !== "undefined") {
+        if (startUrls.length > 0 || !startUrls[0] == "https://example.com/") {
+            return await Apify.openRequestList("start-urls", startUrls);
+        } else {
+            // this is also for local dev as default start array is example.com
+            return await Apify.openRequestList("start-urls", [
+                "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
+            ]); // works
+        }
+    } else {
+        // for local dev
+        return await Apify.openRequestList("start-urls", [
+            "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
+        ]); // works
+        // const requestList = await Apify.openRequestList('start-urls', [{url: 'https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY/osobe/PP1158039', userData: {label: "DIRECTOR_PAST_COMPANIES"}}]);
+    }
+}
 
+async function getUrlsFromSitemap(url, regex) {
+    return await RequestList.open(null, [
+        {
+            requestsFromUrl: "url",
+        },
+    ]);
+}

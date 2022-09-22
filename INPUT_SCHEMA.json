@@ -1,19 +1,17 @@
 {
-  "title": "PuppeteerCrawler Template",
-  "description": "lorem ipsum",
-  "type": "object",
-  "schemaVersion": 1,
-  "properties": {
-    "startUrls": {
-      "title": "Start URLs",
-      "type": "array",
-      "description": "URLs to start with.",
-      "editor": "requestListSources",
-      "prefill": [
-        { "url": "https://apify.com" }
-      ]
-    },
-      "proxyConfig": {
+    "title": "PuppeteerCrawler Template",
+    "description": "lorem ipsum",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Start URLs",
+            "type": "array",
+            "description": "URLs to start with.",
+            "editor": "requestListSources",
+            "prefill": [{ "url": "https://apify.com" }]
+        },
+        "proxyConfig": {
             "title": "Proxy configuration",
             "type": "object",
             "description": "You will need to use Apify proxy or custom proxies. Automatic proxy works very well for Google Maps.",
@@ -26,9 +24,55 @@
             "editor": "proxy",
             "sectionCaption": "Proxy settings",
             "sectionDescription": "How the browsers will behave during the scraping process."
+        },
+        "sitemap": {
+            "title": "the URLS are sitemaps not standard pages",
+            "type": "boolean",
+            "description": "If checked, Sitemap url scraper will be used.",
+            "default": false
+        },
+        "OIBs": {
+            "title": "For scraping with OIB",
+            "type": "array",
+            "description": "OIBs to scrap with",
+            "editor": "requestListSources",
+            "prefill": [{ "url": "22314700357" }]
+        },
+
+        "MBSs": {
+            "title": "For scraping with MBS",
+            "type": "array",
+            "description": "MBS to scrap with",
+            "editor": "requestListSources",
+            "prefill": [{ "url": "060352312" }]
+        },
+        "MBS": {
+            "title": "should we use MBS to scrap?",
+            "type": "boolean",
+            "description": "If checked, MBS scraper will be used.",
+            "default": false
+        },
+        "OIB": {
+            "title": "should we use OIBs to scrap?",
+            "type": "boolean",
+            "description": "If checked, OIB scraper will be used.",
+            "default": false
+        },
+        "SearchTermSearch": {
+            "title": "If true then search terms will be used to scrapk",
+            "type": "boolean",
+            "description": "If true then search terms array will be used",
+            "default": false
+        },
+        "SearchTerms": {
+            "title": "For scraping with company names",
+            "type": "array",
+            "description": "search terms such as business names to scrap with",
+            "editor": "requestListSources",
+            "prefill": [{ "url": "cryt limited" }]
         }
-  },
-  "required": [
-    "startUrls"
-  ]
+
+    },
+
+    "required": ["startUrls"]
 }
