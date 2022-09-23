@@ -21,7 +21,7 @@ function logInfo(message, levelOfImportance, error = false) {
     }
 }
 
-exports.handleDirector = async ({ request, page }) => {
+exports.handleDirector = async ({ request, page,session }) => {
     // ensure that the same name is not scraped twice aka tomislav that is a owner and a directory no need to scrap twice
     // Handle details
     console.log("--------------------- Handle director ----------------------");
@@ -36,6 +36,7 @@ exports.handleDirector = async ({ request, page }) => {
     var dateOfScrap = new Date();
     if (await checkForRegisterPage(page)) {
         console.error("it is register page");
+        session.retire()
         return; // this needs to be use new proxy
     } else {
         console.log("Not register page");
@@ -64,7 +65,7 @@ exports.handleDirector = async ({ request, page }) => {
     return returnObj;
 };
 
-exports.handleStart = async ({ request, page }, requestQueue) => {
+exports.handleStart = async ({ request, page, session }, requestQueue) => {
     await page.waitFor(300);
     var dateOfScrap = new Date();
 
@@ -72,6 +73,7 @@ exports.handleStart = async ({ request, page }, requestQueue) => {
     console.log(url);
     if (await checkForRegisterPage(page)) {
         console.error("it is register page");
+        session.retire()
         return; // this needs to be use new proxy
     } else {
         console.log("Not register page");
@@ -136,7 +138,15 @@ exports.handleDetail = async ({ request, page }) => {
     // Handle details
 };
 
-exports.handleSitemap = async ({request, page}, requestQueue) => {
+exports.handleSitemap = async ({request, page, session}, requestQueue) => {
+
+    if (await checkForRegisterPage(page)) {
+        console.error("it is register page");
+        session.retire()
+        return; // this needs to be use new proxy
+    } else {
+        console.log("Not register page");
+    }
 
     const link = page.querySelectorAll("urlset > url > loc");
 

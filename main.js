@@ -27,6 +27,10 @@ Apify.main(async () => {
 
     const { proxyConfig } = input;
     let proxyConfiguration = proxyConfig;
+    if(proxyConfig) {
+        const proxyConfiguration = await Actor.createProxyConfiguration();
+        // const proxyUrl = proxyConfiguration.newUrl();
+    }
     let requestList = await handleInput(input);
     
 
@@ -41,7 +45,7 @@ Apify.main(async () => {
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-        // proxyConfiguration, // This is for local testing
+        proxyConfiguration, // This is for local testing
 
         launchContext: {
             // Chrome with stealth should work for most websites.
@@ -94,7 +98,10 @@ async function handleInput(input) {
     } = input;
     if (sitemapURL) {
         // return await getUrlsFromSitemap(sitemapURL);
-        return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
+        // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
+        return new Apify.requestList('sitemap', [
+            {url: startUrls, userData: {label: "SITEMAP"}}
+        ])
         //SITEMAP
     } else if (OIB) {
         // scraping OIB for search
