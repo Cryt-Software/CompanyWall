@@ -28,6 +28,7 @@ Apify.main(async () => {
     const { proxyConfig } = input;
     let proxyConfiguration = proxyConfig;
     let requestList = await handleInput(input);
+    
 
     const requestQueue = await Apify.openRequestQueue();
 
@@ -65,6 +66,8 @@ Apify.main(async () => {
                     return handleDetail(context);
                 case "DIRECTOR_PAST_COMPANIES":
                     return handleDirector(context);
+                case "SITEMAP":
+                    return handleSitemap(context);    
                 default:
                     return handleStart(context, requestQueue);
             }
@@ -90,7 +93,9 @@ async function handleInput(input) {
         SearchTerms,
     } = input;
     if (sitemapURL) {
-        return await getUrlsFromSitemap(sitemapURL);
+        // return await getUrlsFromSitemap(sitemapURL);
+        return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
+        //SITEMAP
     } else if (OIB) {
         // scraping OIB for search
         //TODO not implmeneted

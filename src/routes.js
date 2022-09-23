@@ -1,4 +1,5 @@
 const Apify = require("apify");
+const { MongoExpiredSessionError } = require("mongodb");
 
 const {
     utils: { log },
@@ -134,6 +135,21 @@ exports.handleList = async ({ request, page }) => {
 exports.handleDetail = async ({ request, page }) => {
     // Handle details
 };
+
+exports.handleSitemap = async ({request, page}, requestQueue) => {
+
+    const link = page.querySelectorAll("urlset > url > loc");
+
+    for (let i = 0; i < link.length; i++) {
+        const url = link[i];
+        
+        requestQueue.addRequest({
+            url: url,
+            userData: { label: "SITEMAP" },
+        });
+    }
+
+}
 
 //this gets the stats of the directory such as how many companies he as been part of etc
 async function handleDirectoryOtherCompaniesStats(page) {
