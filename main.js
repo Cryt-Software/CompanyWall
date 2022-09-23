@@ -12,9 +12,9 @@ const {
     handleDirector,
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
-const {
-    extendConfigJSON,
-} = require("lighthouse/lighthouse-core/config/config");
+// const {
+//     extendConfigJSON,
+// } = require("lighthouse/lighthouse-core/config/config");
 const {
     utils: { log },
 } = Apify;
