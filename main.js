@@ -11,7 +11,7 @@ const {
     handleDetail,
     handleDirector,
 } = require("./src/routes");
-const Mongo = require("./src/MongoDB/mongodb.js");
+const Mongo = require("./src/MongoDB/mongodb");
 const {
     extendConfigJSON,
 } = require("lighthouse/lighthouse-core/config/config");
