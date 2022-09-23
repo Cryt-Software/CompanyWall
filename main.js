@@ -27,10 +27,10 @@ Apify.main(async () => {
 
     const { proxyConfig } = input;
     let proxyConfiguration = proxyConfig;
-    if(proxyConfig) {
-        const proxyConfiguration = await Apify.createProxyConfiguration();
-        // const proxyUrl = proxyConfiguration.newUrl();
-    }
+    // if(proxyConfig) {
+    //     const proxyConfiguration = await Apify.createProxyConfiguration();
+    //     // const proxyUrl = proxyConfiguration.newUrl();
+    // }
     let requestList = await handleInput(input);
     
 
