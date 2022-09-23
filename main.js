@@ -28,7 +28,7 @@ Apify.main(async () => {
     const { proxyConfig } = input;
     let proxyConfiguration = proxyConfig;
     if(proxyConfig) {
-        const proxyConfiguration = await Actor.createProxyConfiguration();
+        const proxyConfiguration = await Apify.createProxyConfiguration();
         // const proxyUrl = proxyConfiguration.newUrl();
     }
     let requestList = await handleInput(input);
@@ -113,14 +113,18 @@ async function handleInput(input) {
         // scraping search terms for search
         //TODO not implmeneted
     } else if (typeof startUrls !== "undefined") {
+
         if (startUrls.length > 0 || !startUrls[0] == "https://example.com/") {
             return await Apify.openRequestList("start-urls", startUrls);
+        
         } else {
+
             // this is also for local dev as default start array is example.com
             return await Apify.openRequestList("start-urls", [
                 "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
             ]); // works
         }
+
     } else {
         // for local dev
         return await Apify.openRequestList("start-urls", [
