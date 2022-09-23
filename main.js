@@ -81,7 +81,7 @@ async function handleInput(input) {
     const {
         startUrls,
         proxyConfig,
-        sitemap,
+        sitemapURL,
         OIB,
         OIBs,
         MBS,
