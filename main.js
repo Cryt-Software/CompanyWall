@@ -89,7 +89,7 @@ async function handleInput(input) {
         SearchTermSearch,
         SearchTerms,
     } = input;
-    if (sitemap) {
+    if (sitemapURL) {
         return await getUrlsFromSitemap(sitemapURL);
     } else if (OIB) {
         // scraping OIB for search
