@@ -19,14 +19,14 @@ exports.mongo = new Mongo();
 Apify.main(async () => {
     let input = await Apify.getInput();
 
-    const { proxyConfig } = input;
+    let { proxyConfig } = input;
 
     console.log(proxyConfig)
 
-    // if(proxyConfig) {
-    //     const proxyConfiguration = await Apify.createProxyConfiguration();
-    //     // const proxyUrl = proxyConfiguration.newUrl();
-    // }
+    if(proxyConfig) {
+        proxyConfig = await Apify.createProxyConfiguration();
+        // const proxyUrl = proxyConfiguration.newUrl();
+    }
     
     let requestList = await handleInput(input);
     
