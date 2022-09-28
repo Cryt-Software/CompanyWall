@@ -1,9 +1,3 @@
-/**
- * This template is a production ready boilerplate for developing with `PuppeteerCrawler`.
- * Use this to bootstrap your projects using the most up-to-date code.
- * If you're looking for examples or want to learn more, see README.
- */
-
 const Apify = require("apify");
 const {
     handleStart,
@@ -26,11 +20,14 @@ Apify.main(async () => {
     let input = await Apify.getInput();
 
     const { proxyConfig } = input;
-    let proxyConfiguration = proxyConfig;
+
+    console.log(proxyConfig)
+
     // if(proxyConfig) {
     //     const proxyConfiguration = await Apify.createProxyConfiguration();
     //     // const proxyUrl = proxyConfiguration.newUrl();
     // }
+    
     let requestList = await handleInput(input);
     
 
@@ -45,7 +42,7 @@ Apify.main(async () => {
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-        proxyConfiguration, // This is for local testing
+        proxyConfig, // This is for local testing
 
         launchContext: {
             // Chrome with stealth should work for most websites.
@@ -87,7 +84,6 @@ Apify.main(async () => {
 async function handleInput(input) {
     const {
         startUrls,
-        proxyConfig,
         sitemapURL,
         OIB,
         OIBs,
