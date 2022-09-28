@@ -150,10 +150,13 @@ exports.handleSitemap = async ({request, page, session}, requestQueue) => {
     }
 
     const link = page.querySelectorAll("urlset > url > loc");
+    console.log('link info coming')
+    console.log(typeof link)
+    console.log(link.length)
 
     for (let i = 0; i < link.length; i++) {
         const url = link[i];
-        
+        console.log(url)
         requestQueue.addRequest({
             url: url,
             userData: { label: "DETAIL" },
