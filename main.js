@@ -86,7 +86,7 @@ Apify.main(async () => {
 async function handleInput(input) {
     const {
         startUrls,
-        sitemapURL,
+        sitemap,
         OIB,
         OIBs,
         MBS,
@@ -94,9 +94,10 @@ async function handleInput(input) {
         SearchTermSearch,
         SearchTerms,
     } = input;
-    if (sitemapURL) {
+    if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
+        console.log(`---------SITEMAP SCRAPER STARTER with start urls`)
         return new Apify.requestList('sitemap', [
             {url: startUrls, userData: {label: "SITEMAP"}}
         ])
