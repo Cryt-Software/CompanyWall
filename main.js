@@ -23,10 +23,11 @@ Apify.main(async () => {
 
     console.log(proxyConfig)
 
-    if(proxyConfig) {
-        proxyConfig = await Apify.createProxyConfiguration();
-        // const proxyUrl = proxyConfiguration.newUrl();
-    }
+    // if(proxyConfig) {
+    //     proxyConfig = await Apify.createProxyConfiguration();
+    //     // const proxyUrl = proxyConfiguration.newUrl();
+    // }
+    const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
     
     let requestList = await handleInput(input);
     
@@ -42,7 +43,8 @@ Apify.main(async () => {
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-        proxyConfig, // This is for local testing
+        
+        proxyConfiguration,
 
         launchContext: {
             // Chrome with stealth should work for most websites.
