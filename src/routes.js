@@ -134,8 +134,9 @@ exports.handleList = async ({ request, page }) => {
     // Handle pagination
 };
 
-exports.handleDetail = async ({ request, page }) => {
+exports.handleDetail = async ({ request, page }, requestQueue) => {
     // Handle details
+    return this.handleStart({ request, page }, requestQueue)
 };
 
 exports.handleSitemap = async ({request, page, session}, requestQueue) => {
@@ -155,7 +156,7 @@ exports.handleSitemap = async ({request, page, session}, requestQueue) => {
         
         requestQueue.addRequest({
             url: url,
-            userData: { label: "SITEMAP" },
+            userData: { label: "DETAIL" },
         });
     }
 
