@@ -97,7 +97,7 @@ async function handleInput(input) {
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
-        console.log(`---------SITEMAP SCRAPER STARTER with start urls`)
+        console.log(`---------SITEMAP SCRAPER STARTER with start urls 2`)
         return new Apify.requestList('sitemap', [
             {url: startUrls, userData: {label: "SITEMAP"}}
         ])
