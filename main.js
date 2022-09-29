@@ -70,7 +70,7 @@ Apify.main(async () => {
                 case "DIRECTOR_PAST_COMPANIES":
                     return handleDirector(context);
                 case "SITEMAP":
-                    return handleSitemap(context);    
+                    return handleSitemap(context, requestQueue);    
                 default:
                     return handleStart(context, requestQueue);
             }
