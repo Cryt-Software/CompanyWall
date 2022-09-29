@@ -6,6 +6,7 @@ const {
     handleDirector,
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
+const { RequestQueue } = require("apify");
 // const {
 //     extendConfigJSON,
 // } = require("lighthouse/lighthouse-core/config/config");
@@ -64,11 +65,11 @@ Apify.main(async () => {
             log.info("Page opened.", { label, url });
             switch (label) {
                 case "LIST":
-                    return handleList(context);
+                    return handleList(context, requestQueue);
                 case "DETAIL":
                     return handleDetail(context, requestQueue);
                 case "DIRECTOR_PAST_COMPANIES":
-                    return handleDirector(context);
+                    return handleDirector(context,requestQueue);
                 case "SITEMAP":
                     return handleSitemap(context, requestQueue);    
                 default:
@@ -83,7 +84,7 @@ Apify.main(async () => {
 });
 
 // this is used to handle in put from apify console
-async function handleInput(input) {
+async function handleInput(input, requestQueue) {
     const {
         startUrls,
         sitemap,
@@ -98,7 +99,7 @@ async function handleInput(input) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
         console.log(`---------SITEMAP SCRAPER STARTER with start urls 2`)
-        return new Apify.requestList('sitemap', [
+        return new Apify.openRequestQueue('sitemap', [
             {url: startUrls, userData: {label: "SITEMAP"}}
         ])
         //SITEMAP
@@ -119,14 +120,14 @@ async function handleInput(input) {
         } else {
 
             // this is also for local dev as default start array is example.com
-            return await Apify.openRequestList("start-urls", [
+            return await Apify.openRequestQueue("start-urls", [
                 "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
             ]); // works
         }
 
     } else {
         // for local dev
-        return await Apify.openRequestList("start-urls", [
+        return await Apify.openRequestQueue("start-urls", [
             "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
         ]); // works
         // const requestList = await Apify.openRequestList('start-urls', [{url: 'https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY/osobe/PP1158039', userData: {label: "DIRECTOR_PAST_COMPANIES"}}]);
