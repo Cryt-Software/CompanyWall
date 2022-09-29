@@ -99,7 +99,7 @@ async function handleInput(input, requestQueue) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
         console.log(`---------SITEMAP SCRAPER STARTER with start urls 2`)
-        return new Apify.openRequestQueue('sitemap', [
+        return await Apify.openRequestQueue('sitemap', [
             {url: startUrls, userData: {label: "SITEMAP"}}
         ])
         //SITEMAP
