@@ -85,7 +85,7 @@ Apify.main(async () => {
 
 // this is used to handle in put from apify console
 async function handleInput(input, requestQueue) {
-    const {
+    let {
         startUrls,
         sitemap,
         OIB,
@@ -95,13 +95,15 @@ async function handleInput(input, requestQueue) {
         SearchTermSearch,
         SearchTerms,
     } = input;
+
+    // sitemap = 'url'
+    // startUrls = ['https://www.companywall.hr/sitemap/companies?p=725'] 
+    
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
         console.log(`---------SITEMAP SCRAPER STARTER with start urls 2`)
-        console.log(sitemap)
-        console(`Start urls are ${startUrls} `)
-        // console.log(startUrls)
+        console.log(startUrls)
         return await Apify.openRequestQueue('sitemap', [
             {url: startUrls, userData: {label: "SITEMAP"}}
         ])
