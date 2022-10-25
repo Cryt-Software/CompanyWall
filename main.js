@@ -34,6 +34,7 @@ Apify.main(async () => {
     console.log('after requrst list')
 
     const requestQueue = await Apify.openRequestQueue();
+    // const requestQueue = await Apify.openRequestQueue();
 
     console.log(requestList)
     console.log(requestQueue)
@@ -98,7 +99,7 @@ async function handleInput(input, requestQueue) {
         OIBs,
         MBS,
         MBSs,
-        SearchTermSearch,
+        SearchTermSearch,  
         SearchTerms,
     } = input;
 
@@ -108,10 +109,12 @@ async function handleInput(input, requestQueue) {
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
-        console.log(`---------SITEMAP SCRAPER STARTER with start urls version 2`)
+        console.log(`---------SITEMAP SCRAPER STARTER with start urls version 2 ef asdasdasd`)
+        console.log('sdfasddddddddddddddd')
+        console.log('asdfasdfkasdf')
         console.log(startUrls)
         return await Apify.openRequestList('sitemap', [
-            {url: startUrls, userData: {label: "SITEMAP"}}
+            {url: startUrls[0], userData: {label: "SITEMAP"}}
         ])
         //SITEMAP
     } else if (OIB) {
