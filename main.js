@@ -31,10 +31,16 @@ Apify.main(async () => {
     const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
     
     let requestList = await handleInput(input);
-    
+    console.log('after requrst list')
 
     const requestQueue = await Apify.openRequestQueue();
 
+    console.log(requestList)
+    console.log(requestQueue)
+
+    console.log('ABOUT TO SPIT THE INPUT')
+
+    console.log('just for testing')
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
@@ -102,9 +108,9 @@ async function handleInput(input, requestQueue) {
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
-        console.log(`---------SITEMAP SCRAPER STARTER with start urls 2`)
+        console.log(`---------SITEMAP SCRAPER STARTER with start urls version 2`)
         console.log(startUrls)
-        return await Apify.openRequestQueue('sitemap', [
+        return await Apify.openRequestList('sitemap', [
             {url: startUrls, userData: {label: "SITEMAP"}}
         ])
         //SITEMAP
@@ -125,14 +131,14 @@ async function handleInput(input, requestQueue) {
         } else {
 
             // this is also for local dev as default start array is example.com
-            return await Apify.openRequestQueue("start-urls", [
+            return await Apify.openRequestList("start-urls", [
                 "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
             ]); // works
         }
 
     } else {
         // for local dev
-        return await Apify.openRequestQueue("start-urls", [
+        return await Apify.openRequestList("start-urls", [
             "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
         ]); // works
         // const requestList = await Apify.openRequestList('start-urls', [{url: 'https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY/osobe/PP1158039', userData: {label: "DIRECTOR_PAST_COMPANIES"}}]);
