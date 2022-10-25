@@ -141,7 +141,7 @@ exports.handleDetail = async ({ request, page }, requestQueue) => {
 
 exports.handleSitemap = async ({request, page, session}, requestQueue) => {
 
-    if (await checkForRegisterPage(page)) {
+     if (await checkForRegisterPage(page)) {
         console.error("it is register page");
         session.retire()
         return; // this needs to be use new proxy
@@ -149,19 +149,26 @@ exports.handleSitemap = async ({request, page, session}, requestQueue) => {
         console.log("Not register page");
     }
 
-    const link = page.querySelectorAll("urlset > url > loc");
-    console.log('link info coming')
-    console.log(typeof link)
-    console.log(link.length)
+    // const link = page.querySelectorAll("urlset > url > loc");
+    // console.log('link info coming')
+    // console.log(typeof link)
+    // console.log(link.length)
 
-    for (let i = 0; i < link.length; i++) {
-        const url = link[i];
-        console.log(url)
-        requestQueue.addRequest({
-            url: url,
-            userData: { label: "DETAIL" },
-        });
-    }
+    // for (let i = 0; i < link.length; i++) {
+    //     const url = link[i];
+    //     console.log(url)
+    //     requestQueue.addRequest({
+    //         url: url,
+    //         userData: { label: "DETAIL" },
+    //     });
+    // }
+    console.log('asdfasdf')
+    console.log('about to scrap all links')
+    await Apify.utils.enqueueLinks({
+        page,
+        requestQueue,
+        pseudoUrls: ['https://www.companywall.hr/tvrtka[.*]'],
+    });
 
 }
 
