@@ -167,7 +167,8 @@ exports.handleSitemap = async ({request, page, session}, requestQueue) => {
     await Apify.utils.enqueueLinks({
         page,
         requestQueue,
-        pseudoUrls: ['https://www.companywall.hr/tvrtka[.*]'],
+        pseudoUrls: ['https:\/\/www.companywall.hr\/tvrtka.*'],
+
     });
 
 }
