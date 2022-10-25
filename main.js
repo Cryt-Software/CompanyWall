@@ -114,7 +114,7 @@ async function handleInput(input, requestQueue) {
         console.log('asdfasdfkasdf')
         console.log(startUrls)
         return await Apify.openRequestList('sitemap', [
-            {url: startUrls[0],url, userData: {label: "SITEMAP"}}
+            {url: startUrls[0].url, userData: {label: "SITEMAP"}}
         ])
         //SITEMAP
     } else if (OIB) {
