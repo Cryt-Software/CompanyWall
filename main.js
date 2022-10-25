@@ -4,6 +4,7 @@ const {
     handleList,
     handleDetail,
     handleDirector,
+    handleSitemap
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
 const { RequestQueue } = require("apify");
