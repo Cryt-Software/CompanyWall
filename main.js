@@ -78,6 +78,7 @@ Apify.main(async () => {
                 case "DIRECTOR_PAST_COMPANIES":
                     return handleDirector(context,requestQueue);
                 case "SITEMAP":
+                    console.log('sitemap')
                     return handleSitemap(context, requestQueue);    
                 default:
                     return handleStart(context, requestQueue);
