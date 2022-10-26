@@ -115,7 +115,7 @@ async function handleInput(input, requestQueue) {
         console.log('sdfasddddddddddddddd')
         console.log('asdfasdfkasdf')
         console.log(startUrls)
-        const requestList = await RequestList.open(null, [{
+        const requestList = await Apify.RequestList.open(null, [{
            requestsFromUrl: 'https://www.brewbound.com/sitemap.xml',
             regex: '.*',
             }]);
