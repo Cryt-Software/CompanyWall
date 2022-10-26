@@ -117,7 +117,7 @@ async function handleInput(input, requestQueue) {
         console.log(startUrls)
         const requestList = await RequestList.open(null, [{
            requestsFromUrl: 'https://www.brewbound.com/sitemap.xml',
-            regex: .*,
+            regex: '.*',
             }]);
         console.log(requestList)
         return requestList;
