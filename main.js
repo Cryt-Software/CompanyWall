@@ -115,9 +115,15 @@ async function handleInput(input, requestQueue) {
         console.log('sdfasddddddddddddddd')
         console.log('asdfasdfkasdf')
         console.log(startUrls)
-        return await Apify.openRequestList('sitemap', [
-            {url: startUrls[0].url, userData: {label: "SITEMAP"}}
-        ])
+        const requestList = await RequestList.open(null, [{
+           requestsFromUrl: 'https://www.brewbound.com/sitemap.xml',
+            regex: http(s)?:\/\/www\.companywall\.hr\/tvrtka\/[^\/<]+\/[^\/<]+,
+            }]);
+        console.log(requestList)
+        return requestList;
+//         return await Apify.openRequestList('sitemap', [
+//             {url: startUrls[0].url, userData: {label: "SITEMAP"}}
+//         ])
         //SITEMAP
     } else if (OIB) {
         // scraping OIB for search
