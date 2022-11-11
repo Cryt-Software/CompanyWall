@@ -73,6 +73,12 @@
         }
 
     },
+     "PastDirectors": {
+            "title": "should we scrap past directorys?",
+            "type": "boolean",
+            "description": "If checked, past directories will be scrapped. ads one more page.",
+            "default": false
+        },
 
     "required": ["startUrls"]
 }

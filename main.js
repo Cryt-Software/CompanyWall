@@ -8,13 +8,13 @@ const {
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
 const { RequestQueue } = require("apify");
-// const {
-//     extendConfigJSON,
-// } = require("lighthouse/lighthouse-core/config/config");
+
 const {
     utils: { log },
 } = Apify;
 const DEBUG_LEVEL = true;
+
+exports.scrapDirectors = false
 
 exports.mongo = new Mongo();
 
@@ -89,6 +89,7 @@ Apify.main(async () => {
 
     log.info("Starting the crawl.");
     await crawler.run();
+    // TODO put the stats here -
     log.info("Crawl finished.");
 });
 
@@ -103,7 +104,10 @@ async function handleInput(input, requestQueue) {
         MBSs,
         SearchTermSearch,  
         SearchTerms,
+        PastDirectors
     } = input;
+    //newish
+    this.scrapDirectors = PastDirectors
 
     // sitemap = 'url'
     // startUrls = ['https://www.companywall.hr/sitemap/companies?p=725'] 
@@ -111,9 +115,7 @@ async function handleInput(input, requestQueue) {
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
-        console.log(`---------SITEMAP SCRAPER STARTER with start urls version 2 ef asdasdasd`)
-        console.log('sdfasddddddddddddddd')
-        console.log('asdfasdfkasdf')
+        console.log(`---------SITEMAP SCRAPER STARTER ----------------------`)
         console.log(startUrls)
         const requestList = await Apify.RequestList.open(null, [{
            requestsFromUrl: 'https://www.brewbound.com/sitemap.xml',

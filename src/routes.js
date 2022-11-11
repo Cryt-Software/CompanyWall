@@ -1,5 +1,7 @@
 const Apify = require("apify");
-const { computeLogNormalScore } = require("lighthouse/lighthouse-core/audits/audit.js");
+const {
+    computeLogNormalScore,
+} = require("lighthouse/lighthouse-core/audits/audit.js");
 const { MongoExpiredSessionError } = require("mongodb");
 
 const {
@@ -12,10 +14,9 @@ const DEBUG_LEVEL = 3;
 
 function logInfo(message) {
     if (DEBUG) {
-        console.log(message)
-    }  
-   }
-
+        console.log(message);
+    }
+}
 
 exports.handleDirector = async ({ request, page, session }) => {
     // ensure that the same name is not scraped twice aka tomislav that is a owner and a directory no need to scrap twice
@@ -50,9 +51,7 @@ exports.handleDirector = async ({ request, page, session }) => {
         "======================================= DIrector final data==============="
     );
 
-    logInfo(
-        "-------------------- END OF DIRECTORY DATA --------------------"
-    );
+    logInfo("-------------------- END OF DIRECTORY DATA --------------------");
 
     await main.mongo.insert(returnObj);
 
@@ -73,7 +72,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         logInfo("Not register page");
     }
 
-    await getContactDetails(page);
+    let contatDetails = await getContactDetails(page);
 
     let businessName = await handleBusinessName(page);
     let businessCoreDetails = await handleMainBusinessDetails(page);
@@ -82,20 +81,22 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     let businessfinancials = await getFinancialData(page);
     let businessAddress = await handleBusinessAddress(page);
     let businessSummary = await handleBusinessSummary(page);
+    
+    if (main.scrapDirectors) {
+        for (let i = 0; i < directors.length; i++) {
+            //TODO MAKE SURE THAT WE ARE NOT SCRAPING THE SAME DIRECTORS OVER AND OVER AGAIN CHECK THEIR NAME
+            // MAKE A LIST OF ALL THE OBJECTS WITH UNIQUE NAMES
+            const name = directors[i].fullName;
+            const link = directors[i].directorLink;
 
-    for (let i = 0; i < directors.length; i++) {
-        //TODO MAKE SURE THAT WE ARE NOT SCRAPING THE SAME DIRECTORS OVER AND OVER AGAIN CHECK THEIR NAME
-        // MAKE A LIST OF ALL THE OBJECTS WITH UNIQUE NAMES
-        const name = directors[i].fullName;
-        const link = directors[i].directorLink;
-
-        requestQueue.addRequest({
-            url: link,
-            userData: { label: "DIRECTOR_PAST_COMPANIES", name: name },
-        });
+            requestQueue.addRequest({
+                url: link,
+                userData: { label: "DIRECTOR_PAST_COMPANIES", name: name },
+            });
+        }
     }
 
-    await page.waitFor(30000);
+    await page.waitFor(200);
     // List scrap a director based on link given
 
     let returnObj = {
@@ -111,13 +112,17 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         DateScraped: dateOfScrap.toString(),
         TimeToScrap: new Date() - dateOfScrap,
         Type: "company business overview",
+        contactDetails: contatDetails,
+
+        email: contactDetails.email,
+        website: contactDetails.web,
+        telephone: contactDetails.telephone,
+
         Url: page.url(),
     };
     logInfo(
         "-----------------------------Full object coming ---------------------------"
     );
-
-    // logInfo(returnObj);
 
     await main.mongo.insert(returnObj);
 
