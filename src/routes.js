@@ -1,4 +1,5 @@
 const Apify = require("apify");
+const { computeLogNormalScore } = require("lighthouse/lighthouse-core/audits/audit.js");
 const { MongoExpiredSessionError } = require("mongodb");
 
 const {
@@ -9,54 +10,47 @@ const main = require("../main.js");
 const DEBUG = true;
 const DEBUG_LEVEL = 3;
 
-// let mongo = main.mongo
+function logInfo(message) {
+    if (DEBUG) {
+        console.log(message)
+    }  
+   }
 
-function logInfo(message, levelOfImportance, error = false) {
-    if (levelOfImportance <= DEBUG_LEVEL && DEBUG) {
-        if (error) {
-            console.error(message);
-        } else {
-            console.log(message);
-        }
-    }
-}
 
-exports.handleDirector = async ({ request, page,session }) => {
+exports.handleDirector = async ({ request, page, session }) => {
     // ensure that the same name is not scraped twice aka tomislav that is a owner and a directory no need to scrap twice
     // Handle details
-    console.log("--------------------- Handle director ----------------------");
+
+    logInfo("--------------------- Handle director ----------------------");
     let url = page.url();
-    console.log(url);
     let name = request.userData.name;
-    // if (typeof name !== 'undefined'){
-    //     name = '';
-    // }
-    console.log(`THIS IS THE NAME FROM request labels ${name}`);
+
+    logInfo(`THIS IS THE NAME FROM request labels ${name}`);
 
     var dateOfScrap = new Date();
     if (await checkForRegisterPage(page)) {
         console.error("it is register page");
-        session.retire()
+        session.retire();
         return; // this needs to be use new proxy
     } else {
-        console.log("Not register page");
+        logInfo("Not register page");
     }
     let pastCompanies = await handleDirectorPastCompanies(page);
     let pastCompanyStats = await handleDirectoryOtherCompaniesStats(page);
     let returnObj = {
         pastCompanies: pastCompanies,
         pastCompanyStats: pastCompanies,
-        pastCompanyStats:pastCompanyStats,
+        pastCompanyStats: pastCompanyStats,
         url: url,
         dateOfScrap,
         name,
-        Type: 'Directory breakdown'
+        Type: "Directory breakdown",
     };
-    console.log(
+    logInfo(
         "======================================= DIrector final data==============="
     );
-    // console.log(returnObj)
-    console.log(
+
+    logInfo(
         "-------------------- END OF DIRECTORY DATA --------------------"
     );
 
@@ -70,13 +64,13 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     var dateOfScrap = new Date();
 
     let url = page.url();
-    console.log(url);
+    logInfo(url);
     if (await checkForRegisterPage(page)) {
         console.error("it is register page");
-        session.retire()
+        session.retire();
         return; // this needs to be use new proxy
     } else {
-        console.log("Not register page");
+        logInfo("Not register page");
     }
 
     await getContactDetails(page);
@@ -119,11 +113,11 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         Type: "company business overview",
         Url: page.url(),
     };
-    console.log(
+    logInfo(
         "-----------------------------Full object coming ---------------------------"
     );
 
-    // console.log(returnObj);
+    // logInfo(returnObj);
 
     await main.mongo.insert(returnObj);
 
@@ -136,42 +130,39 @@ exports.handleList = async ({ request, page }) => {
 
 exports.handleDetail = async ({ request, page }, requestQueue) => {
     // Handle details
-    return this.handleStart({ request, page }, requestQueue)
+    return this.handleStart({ request, page }, requestQueue);
 };
 
-exports.handleSitemap = async ({request, page, session}, requestQueue) => {
-
-     if (await checkForRegisterPage(page)) {
+exports.handleSitemap = async ({ request, page, session }, requestQueue) => {
+    if (await checkForRegisterPage(page)) {
         console.error("it is register page");
-        session.retire()
+        session.retire();
         return; // this needs to be use new proxy
     } else {
-        console.log("Not register page");
+        logInfo("Not register page");
     }
 
     // const link = page.querySelectorAll("urlset > url > loc");
-    // console.log('link info coming')
-    // console.log(typeof link)
-    // console.log(link.length)
+    // logInfo('link info coming')
+    // logInfo(typeof link)
+    // logInfo(link.length)
 
     // for (let i = 0; i < link.length; i++) {
     //     const url = link[i];
-    //     console.log(url)
+    //     logInfo(url)
     //     requestQueue.addRequest({
     //         url: url,
     //         userData: { label: "DETAIL" },
     //     });
     // }
-    console.log('asdfasdf')
-    console.log('about to scrap all links')
+    logInfo("asdfasdf");
+    logInfo("about to scrap all links");
     await Apify.utils.enqueueLinks({
         page,
         requestQueue,
-        pseudoUrls: ['.*'],
-
+        pseudoUrls: [".*"],
     });
-
-}
+};
 
 //this gets the stats of the directory such as how many companies he as been part of etc
 async function handleDirectoryOtherCompaniesStats(page) {
@@ -262,7 +253,7 @@ works almost the same for related companies
             );
         } catch (e) {
             console.error(e);
-            console.log("failed at link for company directory had ties with");
+            logInfo("failed at link for company directory had ties with");
         }
 
         obj = {
@@ -278,7 +269,7 @@ works almost the same for related companies
         companies.push(obj);
     }
 
-    console.log(companies[1]);
+    logInfo(companies[1]);
     return companies;
 }
 
@@ -293,13 +284,13 @@ async function handleBankDetails(page) {
 // Could improve by using same technique matching <dt> and <dd> values
 // Also by using the helper function to get text would make it look clear
 async function handleBusinessSummary(page) {
-    console.log("handleBusinessSummary called");
+    logInfo("handleBusinessSummary called");
 
     let data = await page.$x(
         '//section/header/div/h3[contains(text(),"Sažetak poslovanja")]/parent::div/parent::header/parent::section/div[@class="container-fluid"]/dl//dt'
     );
 
-    console.log(data.length);
+    logInfo(data.length);
 
     let businessData = [];
     for (let i = 1; i < data.length + 1; i++) {
@@ -326,16 +317,16 @@ async function handleBusinessSummary(page) {
             log.error(e);
         }
     }
-    console.log("business summary data coming");
-    console.log(businessData);
-    console.log("buisness summary end");
+    logInfo("business summary data coming");
+    logInfo(businessData);
+    logInfo("buisness summary end");
     return businessData;
 }
 
 // Simply gets the business name
 async function handleBusinessName(page) {
     let name = await helperGetInnerText(page, "//h1");
-    console.log(`The business name is ${name}`);
+    logInfo(`The business name is ${name}`);
     return {
         BusinessName: name,
     };
@@ -365,7 +356,7 @@ async function handleBusinessAddress(page) {
         postalCode: postalCode,
         addressLocality: addressLocality,
     };
-    console.log(a);
+    logInfo(a);
     return a;
 }
 
@@ -388,7 +379,7 @@ async function handleMainBusinessDetails(page) {
         MBS: MBS,
         dataOfRegister: dataOfRegister,
     };
-    console.log(a);
+    logInfo(a);
     return a;
 }
 
@@ -403,7 +394,7 @@ async function helperGetInnerText(page, xpath) {
             )[0]
         );
     } catch (e) {
-        console.log("failed at helperGetInnerText");
+        logInfo("failed at helperGetInnerText");
     }
     return text;
 }
@@ -413,11 +404,11 @@ async function helperGetInnerText(page, xpath) {
 // TODO IMPLEMENT NEW PROXY AND FINGERPRINT WHEN True
 async function checkForRegisterPage(page) {
     if (page.url() == "https://www.companywall.hr/Account/RegisterOpenUser") {
-        console.log("the page url is true");
+        logInfo("the page url is true");
         return true;
     }
     if (page.url() == "https://www.companywall.hr/Account/Login") {
-        console.log("Asking for login page, failed need new proxy");
+        logInfo("Asking for login page, failed need new proxy");
         return true;
     }
 
@@ -428,13 +419,13 @@ async function checkForRegisterPage(page) {
         );
 
         if (title == "Registrirajte se za besplatan pristup") {
-            console.log("the title is true");
+            logInfo("the title is true");
             return true;
         } else {
-            console.log("Title is not the same");
+            logInfo("Title is not the same");
         }
     } catch (e) {
-        console.log("error getting title");
+        logInfo("error getting title");
     }
 
     return false;
@@ -443,13 +434,13 @@ async function checkForRegisterPage(page) {
 // Handles business details that is mostly used by auditors such as their tax returns been paid properly
 async function handleBusinessDetails(page) {
     // data comes in flat array of even size, with odd numbers being identifer and even being data
-    console.log("handleBusinessPage called");
+    logInfo("handleBusinessPage called");
 
     let data = await page.$x(
         '//section/header/div/h3[contains(text(),"Osnovni podaci")]/parent::div/parent::header/parent::section/div[@class="container-fluid"]/dl//dt'
     );
 
-    console.log(data.length);
+    logInfo(data.length);
 
     let businessData = [];
     for (let i = 1; i < data.length + 1; i++) {
@@ -478,7 +469,7 @@ async function handleBusinessDetails(page) {
             log.error(e);
         }
     }
-    console.log(businessData);
+    logInfo(businessData);
     return businessData;
 }
 
@@ -510,10 +501,10 @@ async function getFinancialData(page) {
     // check if exists
     let table = await page.$x(tableXpath);
     if (table.length == 0) {
-        console.log("No Fincancial Data");
+        logInfo("No Fincancial Data");
         return {};
     } else {
-        console.log("There is fincancial data");
+        logInfo("There is fincancial data");
     }
 
     // get row length
@@ -580,11 +571,6 @@ async function getFinancialData(page) {
             )
         );
     }
-    // console.log(row2019);
-
-    // console.log(row2020);
-    // console.log(row2021);
-    // console.log(rowDataName);
 
     let result2019 = [];
     let result2020 = [];
@@ -601,7 +587,7 @@ async function getFinancialData(page) {
         result2021.push({ [rowLabel]: row2021Single });
     }
     let result = { 2019: result2019, 2020: result2020, 2021: result2021 };
-    console.log(result);
+    logInfo(result);
     return result;
 }
 
@@ -651,54 +637,34 @@ async function getContactDetails(page) {
     const buttonXpath = (type) =>
         `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]//button//i`;
 
-    // let telephone = "";
-    // if (isTel) {
-    //     console.log("Telephone is listed");
-    //     const elements = await page.$x(xpathForTelDD + "//button//i");
-    //     await page.waitFor(400);
-    //     if (elements.length == 0) {
-    //         console.log("There is no Tel button ERROR");
-    //     } else {
-    //         await elements[0].click();
-    //         await page.waitFor(300);
-    //         telephone = await helperGetInnerText(
-    //             page,
-    //             xpathForTelDD + "/div/span"
-    //         ); //TESTING
-    //         console.log(`The telephone is ${telephone}`);
-    //     }
-    // } else {
-    //     console.log("There is no telephone listed");
-    // }
-
     let telephone = "";
     try {
         if (isTel) {
-            console.log("Telephone is listed");
+            logInfo("Telephone is listed");
             const elements = await page.$x(buttonXpath("tel"));
             // await page.waitFor(400);
             if (elements.length == 0) {
-                console.log("There is no Tel button ERROR");
+                logInfo("There is no Tel button ERROR");
             } else {
                 await elements[0].click();
                 await page.waitFor(300);
                 await page.waitFor(extractValueFromSpan("tel"), {
                     timeout: 2000,
                 });
-                console.log("xpath has shown");
+                logInfo("xpath has shown");
 
                 telephone = await helperGetInnerText(
                     page,
                     extractValueFromSpan("tel")
                 ); //TESTING
-                console.log(`The telephone is ${telephone}`);
+                logInfo(`The telephone is ${telephone}`);
             }
         } else {
-            console.log("There is no telephone listed");
+            logInfo("There is no telephone listed");
         }
     } catch (e) {
         console.error(e);
-        console.log(
+        logInfo(
             `ERROR PROCESSING telephone in contact scraper on URL ${page.url()}`
         );
     }
@@ -706,11 +672,11 @@ async function getContactDetails(page) {
     let email = "";
     try {
         if (isEmail) {
-            console.log("Email is listed");
+            logInfo("Email is listed");
             const elements = await page.$x(buttonXpath("email"));
             await page.waitFor(400);
             if (elements.length == 0) {
-                console.log("There is no email revail button ERROR");
+                logInfo("There is no email revail button ERROR");
             } else {
                 await elements[0].click();
                 // await page.waitFor(400);
@@ -722,14 +688,14 @@ async function getContactDetails(page) {
                     page,
                     extractValueFromSpan("email")
                 ); //TESTING
-                console.log(`The email is ${email}`);
+                logInfo(`The email is ${email}`);
             }
         } else {
-            console.log("There is no email listed");
+            logInfo("There is no email listed");
         }
     } catch (e) {
         console.error(e);
-        console.log(
+        logInfo(
             `ERROR PROCESSING email in contact scraper on URL ${page.url()}`
         );
     }
@@ -737,12 +703,12 @@ async function getContactDetails(page) {
     let webAddress = "";
     try {
         if (isWeb) {
-            console.log("There is web listed");
+            logInfo("There is web listed");
 
             const elements = await page.$x(buttonXpath("web"));
             // await page.waitFor(400);
             if (elements.length == 0) {
-                console.log("There is no web button ERROR");
+                logInfo("There is no web button ERROR");
             } else {
                 await elements[0].click();
                 await page.waitFor(300);
@@ -765,16 +731,16 @@ async function getContactDetails(page) {
                     page,
                     '//*[@id="main-content"]/div[3]/div[1]/section/div/div/div[1]/div/dl/dd[3]/div/span'
                 );
-                console.log(`the test text is ${testText} `);
+                logInfo(`the test text is ${testText} `);
 
-                console.log(`The website is ${webAddress}`);
+                logInfo(`The website is ${webAddress}`);
             }
         } else {
-            console.log("There is no Web");
+            logInfo("There is no Web");
         }
     } catch (e) {
         console.error(e);
-        console.log(
+        logInfo(
             `ERROR PROCESSING Web address in contact scraper on URL ${page.url()}`
         );
     }
@@ -819,7 +785,7 @@ async function getContactDetails(page) {
         telephone: telephone,
         web: webAddress,
     };
-    console.log(result);
+    logInfo(result);
     return result;
 }
 
@@ -892,7 +858,7 @@ async function handleDirectors(page) {
             log.error(e);
         }
     }
-    console.log(directors);
+    logInfo(directors);
     return directors;
 }
 
