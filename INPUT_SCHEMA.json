@@ -70,15 +70,13 @@
             "description": "search terms such as business names to scrap with",
             "editor": "requestListSources",
             "prefill": [{ "url": "cryt limited" }]
-        }
-
-    },
-     "PastDirectors": {
+        },
+        "PastDirectors": {
             "title": "should we scrap past directorys?",
             "type": "boolean",
-            "description": "If checked, past directories will be scrapped. ads one more page.",
+            "description": "If checked, past directories will be scrapped. ads one more",
             "default": false
-        },
-
-    "required": ["startUrls"]
+        }
+    },
+         "required": ["startUrls"]
 }
