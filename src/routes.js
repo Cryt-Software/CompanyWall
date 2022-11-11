@@ -68,7 +68,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         logInfo("Not register page");
     }
 
-    let contatDetails = await getContactDetails(page);
+    let contactDetails = await getContactDetails(page);
 
     let businessName = await handleBusinessName(page);
     let businessCoreDetails = await handleMainBusinessDetails(page);
@@ -108,7 +108,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         DateScraped: dateOfScrap.toString(),
         TimeToScrap: new Date() - dateOfScrap,
         Type: "company business overview",
-        contactDetails: contatDetails,
+        contactDetails: contactDetails,
 
         email: contactDetails.email,
         website: contactDetails.web,
