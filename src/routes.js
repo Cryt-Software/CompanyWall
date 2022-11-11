@@ -648,10 +648,16 @@ async function getContactDetails(page) {
                 logInfo("There is no Tel button ERROR");
             } else {
                 await elements[0].click();
-                await page.waitFor(300);
-                await page.waitFor(extractValueFromSpan("tel"), {
-                    timeout: 2000,
-                });
+                // await page.waitFor(300);
+                try {
+                    await page.waitFor(extractValueFromSpan("tel"), {
+                        timeout: 350,
+                    });
+                } catch (e) {
+                    console.error("===== No telephone found timed out -----");
+                    console.error(e);
+                    console.error("==========================================");
+                }
                 logInfo("xpath has shown");
 
                 telephone = await helperGetInnerText(
@@ -675,16 +681,21 @@ async function getContactDetails(page) {
         if (isEmail) {
             logInfo("Email is listed");
             const elements = await page.$x(buttonXpath("email"));
-            await page.waitFor(400);
+            // await page.waitFor(400);
             if (elements.length == 0) {
                 logInfo("There is no email revail button ERROR");
             } else {
                 await elements[0].click();
                 // await page.waitFor(400);
-
-                await page.waitFor(extractValueFromSpan("email"), {
-                    timeout: 2000,
-                });
+                try {
+                    await page.waitFor(extractValueFromSpan("email"), {
+                        timeout: 600,
+                    });
+                } catch (e) {
+                    console.error("===== No email found timed out -----");
+                    console.error(e);
+                    console.error("==========================================");
+                }
                 email = await helperGetInnerText(
                     page,
                     extractValueFromSpan("email")
@@ -713,15 +724,15 @@ async function getContactDetails(page) {
             } else {
                 await elements[0].click();
                 await page.waitFor(300);
-                // await page.waitForNavigation({
-                //     waitUntil: 'networkidle0',
-                //     timeout: 2000
-                //   });
-
-                await page.waitFor(extractValueFromSpan("web"), {
-                    timeout: 2000,
-                });
-
+                try {
+                    await page.waitFor(extractValueFromSpan("web"), {
+                        timeout: 750,
+                    });
+                } catch (e) {
+                    console.error("===== No website found timed out -----");
+                    console.error(e);
+                    console.error("==========================================");
+                }
                 webAddress = await helperGetInnerText(
                     page,
                     extractValueFromSpan("web")
