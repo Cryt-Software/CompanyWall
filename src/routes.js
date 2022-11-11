@@ -55,7 +55,7 @@ exports.handleDirector = async ({ request, page, session }) => {
 };
 
 exports.handleStart = async ({ request, page, session }, requestQueue) => {
-    await page.waitFor(300);
+    // await page.waitFor(300);
     var dateOfScrap = new Date();
 
     let url = page.url();
@@ -92,7 +92,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         }
     }
 
-    await page.waitFor(200);
+    // await page.waitFor(200);
     // List scrap a director based on link given
 
     let returnObj = {

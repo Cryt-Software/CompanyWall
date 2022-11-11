@@ -4,7 +4,7 @@ const {
     handleList,
     handleDetail,
     handleDirector,
-    handleSitemap
+    handleSitemap,
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
 const { RequestQueue } = require("apify");
@@ -14,7 +14,7 @@ const {
 } = Apify;
 const DEBUG_LEVEL = true;
 
-exports.scrapDirectors = false
+exports.scrapDirectors = false;
 
 exports.mongo = new Mongo();
 
@@ -23,16 +23,17 @@ Apify.main(async () => {
 
     let { proxyConfig } = input;
 
+    const proxyConfiguration = await Apify.createProxyConfiguration(
+        proxyConfig
+    );
 
-    const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
-    
     let requestList = await handleInput(input);
 
     const requestQueue = await Apify.openRequestQueue();
 
-    console.log('ABOUT TO SPIT THE INPUT')
+    console.log("ABOUT TO SPIT THE INPUT");
 
-    console.log('ABOUT TO START')
+    console.log("ABOUT TO START");
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
@@ -42,7 +43,7 @@ Apify.main(async () => {
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-        
+
         proxyConfiguration,
 
         launchContext: {
@@ -67,10 +68,10 @@ Apify.main(async () => {
                 case "DETAIL":
                     return handleDetail(context, requestQueue);
                 case "DIRECTOR_PAST_COMPANIES":
-                    return handleDirector(context,requestQueue);
+                    return handleDirector(context, requestQueue);
                 case "SITEMAP":
-                    console.log('sitemap')
-                    return handleSitemap(context, requestQueue);    
+                    console.log("sitemap");
+                    return handleSitemap(context, requestQueue);
                 default:
                     return handleStart(context, requestQueue);
             }
@@ -92,30 +93,32 @@ async function handleInput(input, requestQueue) {
         OIBs,
         MBS,
         MBSs,
-        SearchTermSearch,  
+        SearchTermSearch,
         SearchTerms,
-        PastDirectors
+        PastDirectors,
     } = input;
     //newish
-    this.scrapDirectors = PastDirectors
+    this.scrapDirectors = PastDirectors;
 
     // sitemap = 'url'
-    // startUrls = ['https://www.companywall.hr/sitemap/companies?p=725'] 
-    
+    // startUrls = ['https://www.companywall.hr/sitemap/companies?p=725']
+
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
-        console.log(`---------SITEMAP SCRAPER STARTER ----------------------`)
-        console.log(startUrls)
-        const requestList = await Apify.RequestList.open(null, [{
-           requestsFromUrl: 'https://www.brewbound.com/sitemap.xml',
-            regex: '.*',
-            }]);
-        console.log(requestList)
+        console.log(`---------SITEMAP SCRAPER STARTER ----------------------`);
+        console.log(startUrls);
+        const requestList = await Apify.RequestList.open(null, [
+            {
+                requestsFromUrl: "https://www.brewbound.com/sitemap.xml",
+                regex: ".*",
+            },
+        ]);
+        console.log(requestList);
         return requestList;
-//         return await Apify.openRequestList('sitemap', [
-//             {url: startUrls[0].url, userData: {label: "SITEMAP"}}
-//         ])
+        //         return await Apify.openRequestList('sitemap', [
+        //             {url: startUrls[0].url, userData: {label: "SITEMAP"}}
+        //         ])
         //SITEMAP
     } else if (OIB) {
         // scraping OIB for search
@@ -127,18 +130,14 @@ async function handleInput(input, requestQueue) {
         // scraping search terms for search
         //TODO not implmeneted
     } else if (typeof startUrls !== "undefined") {
-
         if (startUrls.length > 0 || !startUrls[0] == "https://example.com/") {
             return await Apify.openRequestList("start-urls", startUrls);
-        
         } else {
-
             // this is also for local dev as default start array is example.com
             return await Apify.openRequestList("start-urls", [
                 "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
             ]); // works
         }
-
     } else {
         // for local dev
         return await Apify.openRequestList("start-urls", [
