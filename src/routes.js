@@ -68,7 +68,8 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         logInfo("Not register page");
     }
 
-    // let contactDetails = await getContactDetails(page);
+    let contactDetails = await getContactDetails(page);
+    
 
     let businessName = await handleBusinessName(page);
     let businessCoreDetails = await handleMainBusinessDetails(page);
@@ -110,9 +111,9 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         Type: "company business overview",
         // contactDetails: contactDetails,
 
-        // email: contactDetails.email,
-        // website: contactDetails.web,
-        // telephone: contactDetails.telephone,
+        email: contactDetails.email,
+        website: contactDetails.web,
+        telephone: contactDetails.telephone,
 
         Url: page.url(),
     };

@@ -39,17 +39,20 @@ Apify.main(async () => {
         requestQueue,
         maxRequestRetries: 1,
         useSessionPool: true,
+        
+        sessionPoolOptions: { maxPoolSize: 1 },
         // Overrides default Session pool configuration
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-
+        maxConcurrency:1,
         proxyConfiguration,
 
         launchContext: {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
             useChrome: true,
+            stealth:true,
         },
         browserPoolOptions: {
             // This allows browser to be more effective against anti-scraping protections.
@@ -73,6 +76,7 @@ Apify.main(async () => {
                     console.log("sitemap");
                     return handleSitemap(context, requestQueue);
                 default:
+                    
                     return handleStart(context, requestQueue);
             }
         },
