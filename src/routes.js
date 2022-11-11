@@ -1,8 +1,4 @@
 const Apify = require("apify");
-const {
-    computeLogNormalScore,
-} = require("lighthouse/lighthouse-core/audits/audit.js");
-const { MongoExpiredSessionError } = require("mongodb");
 
 const {
     utils: { log },
@@ -81,7 +77,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     let businessfinancials = await getFinancialData(page);
     let businessAddress = await handleBusinessAddress(page);
     let businessSummary = await handleBusinessSummary(page);
-    
+
     if (main.scrapDirectors) {
         for (let i = 0; i < directors.length; i++) {
             //TODO MAKE SURE THAT WE ARE NOT SCRAPING THE SAME DIRECTORS OVER AND OVER AGAIN CHECK THEIR NAME
