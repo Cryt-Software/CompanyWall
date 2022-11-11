@@ -108,7 +108,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         DateScraped: dateOfScrap.toString(),
         TimeToScrap: new Date() - dateOfScrap,
         Type: "company business overview",
-        contactDetails: contactDetails,
+        // contactDetails: contactDetails,
 
         // email: contactDetails.email,
         // website: contactDetails.web,
