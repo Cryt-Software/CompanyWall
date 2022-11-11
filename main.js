@@ -23,26 +23,16 @@ Apify.main(async () => {
 
     let { proxyConfig } = input;
 
-    console.log(proxyConfig)
 
-    // if(proxyConfig) {
-    //     proxyConfig = await Apify.createProxyConfiguration();
-    //     // const proxyUrl = proxyConfiguration.newUrl();
-    // }
     const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
     
     let requestList = await handleInput(input);
-    console.log('after requrst list')
 
     const requestQueue = await Apify.openRequestQueue();
-    // const requestQueue = await Apify.openRequestQueue();
-
-    console.log(requestList)
-    console.log(requestQueue)
 
     console.log('ABOUT TO SPIT THE INPUT')
 
-    console.log('just for testing')
+    console.log('ABOUT TO START')
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
