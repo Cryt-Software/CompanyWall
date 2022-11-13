@@ -8,11 +8,17 @@ const {
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
 const { RequestQueue } = require("apify");
-
+DEBUG = FALSE;
 const {
     utils: { log },
 } = Apify;
 const DEBUG_LEVEL = true;
+
+function logInfo(message) {
+    if (DEBUG) {
+        console.log(message);
+    }
+}
 
 exports.scrapDirectors = false;
 
@@ -23,6 +29,8 @@ Apify.main(async () => {
 
     let { proxyConfig } = input;
 
+    console.log( proxyConfig )
+
     const proxyConfiguration = await Apify.createProxyConfiguration(
         proxyConfig
     );
@@ -31,28 +39,29 @@ Apify.main(async () => {
 
     const requestQueue = await Apify.openRequestQueue();
 
-    console.log("ABOUT TO SPIT THE INPUT");
+    logInfo("ABOUT TO SPIT THE INPUT");
 
-    console.log("ABOUT TO START");
+    logInfo("ABOUT TO START");
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
         maxRequestRetries: 1,
         useSessionPool: true,
-        
-        sessionPoolOptions: { maxPoolSize: 1 },
+
+        // sessionPoolOptions: { maxPoolSize: 1 },
         // Overrides default Session pool configuration
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-        maxConcurrency:1,
+        persistCookiesPerSession: true,
+        maxConcurrency: 1,
         proxyConfiguration,
 
         launchContext: {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
             useChrome: true,
-            stealth:true,
+            stealth: true,
         },
         browserPoolOptions: {
             // This allows browser to be more effective against anti-scraping protections.
@@ -64,7 +73,14 @@ Apify.main(async () => {
                 url,
                 userData: { label },
             } = context.request;
-            log.info("Page opened.", { label, url });
+            console.log("Page opened.", { label, url });
+            console.log("Proxy details")
+            console.log(context.proxyInfo)
+            console.log('End of proxy details') 
+            console.log('sessions')
+            console.log(context.session.sessionPool.config)
+            console.log(context.session)
+            console.log('end of session data')
             switch (label) {
                 case "LIST":
                     return handleList(context, requestQueue);
@@ -73,10 +89,9 @@ Apify.main(async () => {
                 case "DIRECTOR_PAST_COMPANIES":
                     return handleDirector(context, requestQueue);
                 case "SITEMAP":
-                    console.log("sitemap");
+                    logInfo("sitemap");
                     return handleSitemap(context, requestQueue);
                 default:
-                    
                     return handleStart(context, requestQueue);
             }
         },
@@ -110,15 +125,15 @@ async function handleInput(input, requestQueue) {
     if (sitemap) {
         // return await getUrlsFromSitemap(sitemapURL);
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
-        console.log(`---------SITEMAP SCRAPER STARTER ----------------------`);
-        console.log(startUrls);
+        logInfo(`---------SITEMAP SCRAPER STARTER ----------------------`);
+        logInfo(startUrls);
         const requestList = await Apify.RequestList.open(null, [
             {
                 requestsFromUrl: "https://www.brewbound.com/sitemap.xml",
                 regex: ".*",
             },
         ]);
-        console.log(requestList);
+        logInfo(requestList);
         return requestList;
         //         return await Apify.openRequestList('sitemap', [
         //             {url: startUrls[0].url, userData: {label: "SITEMAP"}}
