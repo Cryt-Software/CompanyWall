@@ -8,7 +8,7 @@ const {
 } = require("./src/routes");
 const Mongo = require("./src/MongoDB/mongodb");
 const { RequestQueue } = require("apify");
-DEBUG = FALSE;
+DEBUG = false;
 const {
     utils: { log },
 } = Apify;
