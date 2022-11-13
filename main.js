@@ -45,7 +45,7 @@ Apify.main(async () => {
     const crawler = new Apify.PuppeteerCrawler({
         requestList,
         requestQueue,
-        maxRequestRetries: 1,
+        maxRequestRetries: 2,
         useSessionPool: true,
 
         // sessionPoolOptions: { maxPoolSize: 1 },
@@ -54,7 +54,7 @@ Apify.main(async () => {
             maxPoolSize: 100,
         },
         persistCookiesPerSession: true,
-        maxConcurrency: 1,
+        maxConcurrency: 4,
         proxyConfiguration,
 
         launchContext: {

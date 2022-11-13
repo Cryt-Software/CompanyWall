@@ -649,7 +649,7 @@ async function getContactDetails(page) {
                 logInfo("There is no Tel button ERROR");
             } else {
                 await elements[0].click();
-                // await page.waitFor(300);
+                await page.waitFor(300);
                 try {
                     await page.waitFor(extractValueFromSpan("tel"), {
                         timeout: 350,
@@ -687,7 +687,7 @@ async function getContactDetails(page) {
                 logInfo("There is no email revail button ERROR");
             } else {
                 await elements[0].click();
-                // await page.waitFor(400);
+                await page.waitFor(300);
                 try {
                     await page.waitFor(extractValueFromSpan("email"), {
                         timeout: 600,
@@ -719,7 +719,7 @@ async function getContactDetails(page) {
             logInfo("There is web listed");
 
             const elements = await page.$x(buttonXpath("web"));
-            // await page.waitFor(400);
+            await page.waitFor(400);
             if (elements.length == 0) {
                 logInfo("There is no web button ERROR");
             } else {
