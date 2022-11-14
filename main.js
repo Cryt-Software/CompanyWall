@@ -47,6 +47,9 @@ Apify.main(async () => {
     const proxyConfiguration = await Apify.createProxyConfiguration(
         proxyConfig
     );
+    // let requestList =  await Apify.openRequestList("start-urls", [
+    //         "https://www.companywall.hr/tvrtka/timgraf-media-doo/MMxqbQiY",
+    //     ]); // works
 
     let requestList = await handleInput(input);
 
@@ -76,6 +79,11 @@ Apify.main(async () => {
             // If it doesn't, feel free to remove this.
             useChrome: true,
             stealth: true,
+            launchOptions:{
+
+                waitForNetwork: "domcontentloaded",
+                waitUntil: 'domcontentloaded'
+            }
         },
         browserPoolOptions: {
             // This allows browser to be more effective against anti-scraping protections.
@@ -83,13 +91,15 @@ Apify.main(async () => {
             useFingerprints: true,
         },
         navigationTimeoutSecs: 60000,
+        
+        
         handlePageFunction: async (context) => {
             const {
                 url,
                 userData: { label },
             } = context.request;
-
-            await context.page.waitForNetwork({waitUntil: 'domcontentloaded', timeout: 60000} )
+            // await context.page.waitForNavigation({waitUntil: 'domcontentloaded', timeout: 60000} )
+            // await page.context.page.waitForNetworkIdle
             // await context.page.setDefaultNavigationTimeout(60000);
             
             // console.log("Page opened.", { label, url });
