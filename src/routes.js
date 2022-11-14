@@ -1,5 +1,5 @@
 const Apify = require("apify");
-var request = require("request");
+// var request = require("request");
 const {
     utils: { log },
 } = Apify;
