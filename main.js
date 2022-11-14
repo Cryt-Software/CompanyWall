@@ -81,8 +81,8 @@ Apify.main(async () => {
             // stealth: true,
             launchOptions:{
                 headless: true,
-                waitForNetwork: "networkidle0",
-                waitUntil: 'networkidle0',
+                // waitForNetwork: "networkidle0",
+                // waitUntil: 'networkidle0',
             }
         },
         browserPoolOptions: {
