@@ -80,9 +80,9 @@ Apify.main(async () => {
             // useChrome: true,
             stealth: true,
             launchOptions:{
-
-                waitForNetwork: "domcontentloaded",
-                waitUntil: 'domcontentloaded',
+                headless: true,
+                waitForNetwork: "networkidle0",
+                waitUntil: 'networkidle0',
             }
         },
         browserPoolOptions: {
