@@ -1,7 +1,4 @@
 const Apify = require("apify");
-const {
-    setMaxListeners,
-} = require("lighthouse/lighthouse-core/lib/network-recorder.js");
 var request = require("request");
 const {
     utils: { log },
