@@ -71,24 +71,24 @@ Apify.main(async () => {
             maxPoolSize: 100,
         },
         persistCookiesPerSession: true,
-        maxConcurrency: 5,
+        // maxConcurrency: 5,
         proxyConfiguration,
 
         launchContext: {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
-            useChrome: true,
+            // useChrome: true,
             stealth: true,
             launchOptions:{
 
                 waitForNetwork: "domcontentloaded",
-                waitUntil: 'domcontentloaded'
+                waitUntil: 'domcontentloaded',
             }
         },
         browserPoolOptions: {
             // This allows browser to be more effective against anti-scraping protections.
             // If you are having performance issues try turning this off.
-            useFingerprints: true,
+            // useFingerprints: true,
         },
         navigationTimeoutSecs: 60000,
         

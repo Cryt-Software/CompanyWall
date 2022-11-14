@@ -928,8 +928,19 @@ async function handleContactDetailsWithRequest(page) {
         console.error('error parsing the email contact value')
     }
 
-  
+   if (email.includes("<!doctype html>")){
+        console.error('EMAIL PICKED UP WHOLE PAGE')
+        email = ''
+   }
 
+   if (tel.includes("<!doctype html>")){
+        console.error('tel PICKED UP WHOLE PAGE')
+        tel = ''
+   }
+   if (web.includes("<!doctype html>")){
+        console.error('web PICKED UP WHOLE PAGE')
+        web = ''
+   }
     let result = {
         email: email,
         telephone: tel,
