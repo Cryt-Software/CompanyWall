@@ -877,7 +877,7 @@ async function handleContactDetailsWithRequest(page) {
     );
     
     // web
-    let web = await page.evaluate(() => {
+    let web = await page.evaluate((idc) => {
         return (
             fetch(
                 `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=web`
@@ -894,7 +894,7 @@ async function handleContactDetailsWithRequest(page) {
     });
 
     // tel
-    let tel = await page.evaluate(() => {
+    let tel = await page.evaluate((idc) => {
         return (
             fetch(
                 `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=tel`
@@ -909,7 +909,7 @@ async function handleContactDetailsWithRequest(page) {
     });
 
     // email
-    let email = await page.evaluate(() => {
+    let email = await page.evaluate((idc) => {
         return (
             fetch(
                 `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=email`
