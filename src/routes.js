@@ -3,7 +3,7 @@ const Apify = require("apify");
 const {
     utils: { log },
 } = Apify;
-// eonst main = require("../main.js");
+const main = require("../main.js");
 
 
 const DEBUG = true;
