@@ -40,15 +40,16 @@ exports.mongo = new Mongo();
 Apify.main(async () => {
     let input = await Apify.getInput();
 
-    // let { proxyConfig } = input;
+    let { proxyConfig } = input;
 
-    // console.log( proxyConfig )
+    console.log( proxyConfig )
 
     const proxyConfiguration = await Apify.createProxyConfiguration(
-        // proxyConfig
+        proxyConfig
     );
 
     let requestList = await handleInput(input);
+
 
     const requestQueue = await Apify.openRequestQueue();
 
@@ -87,14 +88,14 @@ Apify.main(async () => {
                 userData: { label },
             } = context.request;
             
-            console.log("Page opened.", { label, url });
-            console.log("Proxy details")
-            console.log(context.proxyInfo)
-            console.log('End of proxy details') 
-            console.log('sessions')
-            console.log(context.session.sessionPool.config)
-            console.log(context.session)
-            console.log('end of session data')
+            // console.log("Page opened.", { label, url });
+            // console.log("Proxy details")
+            // console.log(context.proxyInfo)
+            // console.log('End of proxy details') 
+            // console.log('sessions')
+            // console.log(context.session.sessionPool.config)
+            // console.log(context.session)
+            // console.log('end of session data')
             switch (label) {
                 case "LIST":
                     return handleList(context, requestQueue);

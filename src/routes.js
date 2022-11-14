@@ -158,7 +158,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         DateScraped: dateOfScrap.toString(),
         TimeToScrap: new Date() - dateOfScrap,
         Type: "company business overview",
-        // contactDetails: contactDetails,
+        contactDetails: contactDetails,
 
         email: contactDetails.email,
         website: contactDetails.web,
@@ -858,7 +858,6 @@ async function getContactDetails(page) {
 
 async function handleContactDetailsWithRequest(page) {
     // First get the IDC variable on all of the buttons.
-
     const extractValueFromSpan = (type) =>
         `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]/div/span`;
 
@@ -884,58 +883,52 @@ async function handleContactDetailsWithRequest(page) {
             )
                 // Retrieve its body as ReadableStream
                 .then((response) => response.text())
-                .then((text) => {
-                    text = text.replace("<p class='mb-0'>", "");
-                    text = text.replace("</p>", "");
-                    console.log(text);
-                    // …
-                })
+                // .then((text) => {
+                //     text = text.replace("<p class='mb-0'>", "");
+                //     text = text.replace("</p>", "");
+                //     // …
+                // })
         );
-    });
+    }, idc);
+    try{
+        web = web.replace("<p class='mb-0'>", "")
+        web = web.replace("</p>", "");
+    }catch(e){
+        console.error('error formating the web contact details')
+    }
 
     // tel
     let tel = await page.evaluate((idc) => {
         return (
             fetch(
                 `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=tel`
-            )
-                // Retrieve its body as ReadableStream
-                .then((response) => response.text())
-                .then((text) => {
-                    console.log(text);
-                    // …
-                })
+            ).then((response) => response.text())
+              
         );
-    });
+    },idc);
 
     // email
-    // let email = await page.evaluate((idc) => {
-    //     return (
-    //         fetch(
-    //             `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=email`
-    //         )
-    //             // Retrieve its body as ReadableStream
-    //             .then((response) => response.text())
-    //             .then((text) => {
-    //                 text = text.replace(/<.*itemprop='email'>/i, "");
-    //                 text = text.replace("</a>", "");
-    //                 console.log(text);
-    //                 // …
-    //             })
-    //     );
-    // });
     let email = await page.evaluate((idc) => {
         return (
             fetch(
                 `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=email`
             )
+                // Retrieve its body as ReadableStream
+                .then((response) => response.text())
+                // .then((text) => {
+                //     text = text.replace(/<.*itemprop='email'>/i, "");
+                //     text = text.replace("</a>", "");
+                // })
         );
-    });
-    email = email.text()
-    email = email.replace(/<.*itemprop='email'>/i, "");
-    email = text.replace("</a>", "");
-    console.log(email);
+    },idc);
+    try{
+        email = email.replace("</p>", "");
+        email = email.replace(/<.*itemprop='email'>/i, "");
+    }catch(e){
+        console.error('error parsing the email contact value')
+    }
 
+  
 
     let result = {
         email: email,
