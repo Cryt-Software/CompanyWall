@@ -20,6 +20,19 @@ function logInfo(message) {
     }
 }
 
+
+
+exports.stats = {
+    contact_phone_scrapped : 0,
+    contact_web_scrapped : 0,
+    contact_email_scrapped : 0,
+    database_added: 0,
+    register_page_hit:0,
+    session_retired: 0,
+    time_to_scrap:[]
+
+}
+
 exports.scrapDirectors = false;
 
 exports.mongo = new Mongo();
@@ -27,12 +40,12 @@ exports.mongo = new Mongo();
 Apify.main(async () => {
     let input = await Apify.getInput();
 
-    let { proxyConfig } = input;
+    // let { proxyConfig } = input;
 
-    console.log( proxyConfig )
+    // console.log( proxyConfig )
 
     const proxyConfiguration = await Apify.createProxyConfiguration(
-        proxyConfig
+        // proxyConfig
     );
 
     let requestList = await handleInput(input);
@@ -73,6 +86,7 @@ Apify.main(async () => {
                 url,
                 userData: { label },
             } = context.request;
+            
             console.log("Page opened.", { label, url });
             console.log("Proxy details")
             console.log(context.proxyInfo)
@@ -173,3 +187,7 @@ async function getUrlsFromSitemap(url, regex) {
         },
     ]);
 }
+
+
+console.log('STATS')
+console.log(this.stats)

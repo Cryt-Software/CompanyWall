@@ -1,9 +1,12 @@
 const Apify = require("apify");
-
+const { setMaxListeners } = require("lighthouse/lighthouse-core/lib/network-recorder.js");
+var request = require("request");
 const {
     utils: { log },
 } = Apify;
 const main = require("../main.js");
+
+let stats = main.stats;
 
 const DEBUG = true;
 const DEBUG_LEVEL = 3;
@@ -26,6 +29,7 @@ exports.handleDirector = async ({ request, page, session }) => {
 
     var dateOfScrap = new Date();
     if (await checkForRegisterPage(page)) {
+        main.stats.register_page_hit = main.stats.register_page_hit + 1;
         console.error("it is register page");
         session.retire();
         return; // this needs to be use new proxy
@@ -61,6 +65,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     let url = page.url();
     logInfo(url);
     if (await checkForRegisterPage(page)) {
+        main.stats.register_page_hit = main.stats.register_page_hit + 1;
         console.error("it is register page");
         session.retire();
         return; // this needs to be use new proxy
@@ -69,7 +74,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     }
 
     let contactDetails = await getContactDetails(page);
-    
+    let contactDetails = await handleContactDetailsWithRequest(page)
 
     let businessName = await handleBusinessName(page);
     let businessCoreDetails = await handleMainBusinessDetails(page);
@@ -122,6 +127,11 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     );
 
     await main.mongo.insert(returnObj);
+    main.stats.database_added = main.stats.database_added + 1;
+
+    var finishedscrap = new Date();
+    let length = finishedscrap - dateOfScrap;
+    main.stats.time_to_scrap.push(length);
 
     return returnObj;
 };
@@ -800,6 +810,87 @@ async function getContactDetails(page) {
     };
     logInfo(result);
     return result;
+}
+
+async function handleContactDetailsWithRequest(page) {
+    // First get the IDC variable on all of the buttons.
+    const idc = await page.evaluate(
+        (el) => el.attributes["data-idc"].value,
+        (
+            await page.$x(path)
+        )[0]
+    );
+
+    const extractValueFromSpan = (type) =>
+        `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]/div/span`;
+
+    const buttonXpath = (type) =>
+        `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]//button//i`;
+
+    const getRequestUrl = (type) =>
+        `https://www.companywall.hr/Home/GetContact?id=0&idc=81555&type=${type};
+`;
+
+
+
+    // web
+    let web = await page.evaluate(() => {
+        return (
+            fetch(
+                `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=web`
+            )
+                // Retrieve its body as ReadableStream
+                .then((response) => response.text())
+                .then((text) => {
+                    text = text.replace("<p class='mb-0'>", "");
+                    text = text.replace("</p>", "");
+                    console.log(text);
+                    // …
+                })
+        );
+    });
+
+    // tel
+    let tel = await page.evaluate(() => {
+        return (
+            fetch(
+                `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=tel`
+            )
+                // Retrieve its body as ReadableStream
+                .then((response) => response.text())
+                .then((text) => {
+                    console.log(text);
+                    // …
+                })
+        );
+    });
+
+    // email
+    let email = await page.evaluate(() => {
+        return (
+            fetch(
+                `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=email`
+            )
+                // Retrieve its body as ReadableStream
+                .then((response) => response.text())
+                .then((text) => {
+                    text = text.replace(/<.*itemprop='email'>/i, "")
+                    text = text.replace("</a>", "")
+                    console.log(text);
+                    // …
+                })
+        );
+    });
+
+    let result = {
+        email: email,
+        telephone: tel,
+        web: web,
+    };
+    console.log('logging NEW FROM contact details scraper')
+    logInfo(result);
+    return result;
+
 }
 
 //This gets the directors and their links to their specific pages
