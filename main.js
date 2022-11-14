@@ -68,7 +68,7 @@ Apify.main(async () => {
             maxPoolSize: 100,
         },
         persistCookiesPerSession: true,
-        maxConcurrency: 4,
+        maxConcurrency: 5,
         proxyConfiguration,
 
         launchContext: {
@@ -82,11 +82,15 @@ Apify.main(async () => {
             // If you are having performance issues try turning this off.
             useFingerprints: true,
         },
+        navigationTimeoutSecs: 60000,
         handlePageFunction: async (context) => {
             const {
                 url,
                 userData: { label },
             } = context.request;
+
+            page.waitForNetwork({waitUntil: 'domcontentloaded', timeout: 60000} )
+            page.setDefaultNavigationTimeout(60000);
             
             // console.log("Page opened.", { label, url });
             // console.log("Proxy details")
@@ -110,6 +114,15 @@ Apify.main(async () => {
                     return handleStart(context, requestQueue);
             }
         },
+        handleFailedRequestFunction(HandleFailedRequest){
+            console.error('ERRROR IN HANDLE FAILED REQUEST FUNCTION CHANING SESSION')
+            try{
+                console.error(HandleFailedRequest.error)
+                HandleFailedRequest.session.retire()
+            }catch(e){
+                console.error('ERROR CANT ACCESS SESSION FROM HANDLE FAILED REQUEST FUNCTION')
+            }
+        }
     });
 
     log.info("Starting the crawl.");
