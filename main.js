@@ -42,7 +42,7 @@ Apify.main(async () => {
 
     let { proxyConfig } = input;
 
-    console.log( proxyConfig )
+    logInfo( proxyConfig )
 
     const proxyConfiguration = await Apify.createProxyConfiguration(
         proxyConfig
@@ -78,7 +78,7 @@ Apify.main(async () => {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
             // useChrome: true,
-            stealth: true,
+            // stealth: true,
             launchOptions:{
                 headless: true,
                 waitForNetwork: "networkidle0",
@@ -90,7 +90,7 @@ Apify.main(async () => {
             // If you are having performance issues try turning this off.
             // useFingerprints: true,
         },
-        navigationTimeoutSecs: 60000,
+        navigationTimeoutSecs: 30000,
         
         
         handlePageFunction: async (context) => {
@@ -102,14 +102,14 @@ Apify.main(async () => {
             // await page.context.page.waitForNetworkIdle
             // await context.page.setDefaultNavigationTimeout(60000);
             
-            // console.log("Page opened.", { label, url });
-            // console.log("Proxy details")
-            // console.log(context.proxyInfo)
-            // console.log('End of proxy details') 
-            // console.log('sessions')
-            // console.log(context.session.sessionPool.config)
-            // console.log(context.session)
-            // console.log('end of session data')
+            // logInfo("Page opened.", { label, url });
+            // logInfo("Proxy details")
+            // logInfo(context.proxyInfo)
+            // logInfo('End of proxy details') 
+            // logInfo('sessions')
+            // logInfo(context.session.sessionPool.config)
+            // logInfo(context.session)
+            // logInfo('end of session data')
             switch (label) {
                 case "LIST":
                     return handleList(context, requestQueue);
@@ -213,5 +213,5 @@ async function getUrlsFromSitemap(url, regex) {
 }
 
 
-console.log('STATS')
-console.log(this.stats)
+logInfo('STATS')
+logInfo(this.stats)

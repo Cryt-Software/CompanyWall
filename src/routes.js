@@ -6,7 +6,7 @@ const {
 const main = require("../main.js");
 
 
-const DEBUG = true;
+const DEBUG = false;
 const DEBUG_LEVEL = 3;
 
 function logInfo(message) {
