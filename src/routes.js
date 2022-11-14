@@ -3,9 +3,8 @@ const Apify = require("apify");
 const {
     utils: { log },
 } = Apify;
-const main = require("../main.js");
+// eonst main = require("../main.js");
 
-let stats = main.stats;
 
 const DEBUG = true;
 const DEBUG_LEVEL = 3;
@@ -859,12 +858,6 @@ async function getContactDetails(page) {
 
 async function handleContactDetailsWithRequest(page) {
     // First get the IDC variable on all of the buttons.
-    const idc = await page.evaluate(
-        (el) => el.attributes["data-idc"].value,
-        (
-            await page.$x(path)
-        )[0]
-    );
 
     const extractValueFromSpan = (type) =>
         `//section/header/div/h3[contains(text(),'Kontakti')]/parent::div/parent::header/parent::section//div[@class='row']/div[1]//dt[text() = '${type}']/following-sibling::dd[1]/div/span`;
@@ -876,6 +869,13 @@ async function handleContactDetailsWithRequest(page) {
         `https://www.companywall.hr/Home/GetContact?id=0&idc=81555&type=${type};
 `;
 
+    const idc = await page.evaluate(
+        (el) => el.attributes["data-idc"].value,
+        (
+            await page.$x('//button[@data-idc]')
+        )[0]
+    );
+    
     // web
     let web = await page.evaluate(() => {
         return (
