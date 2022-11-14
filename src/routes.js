@@ -909,21 +909,33 @@ async function handleContactDetailsWithRequest(page) {
     });
 
     // email
+    // let email = await page.evaluate((idc) => {
+    //     return (
+    //         fetch(
+    //             `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=email`
+    //         )
+    //             // Retrieve its body as ReadableStream
+    //             .then((response) => response.text())
+    //             .then((text) => {
+    //                 text = text.replace(/<.*itemprop='email'>/i, "");
+    //                 text = text.replace("</a>", "");
+    //                 console.log(text);
+    //                 // …
+    //             })
+    //     );
+    // });
     let email = await page.evaluate((idc) => {
         return (
             fetch(
                 `https://www.companywall.hr/Home/GetContact?id=0&idc=${idc}&type=email`
             )
-                // Retrieve its body as ReadableStream
-                .then((response) => response.text())
-                .then((text) => {
-                    text = text.replace(/<.*itemprop='email'>/i, "");
-                    text = text.replace("</a>", "");
-                    console.log(text);
-                    // …
-                })
         );
     });
+    email = email.text()
+    email = email.replace(/<.*itemprop='email'>/i, "");
+    email = text.replace("</a>", "");
+    console.log(email);
+
 
     let result = {
         email: email,
