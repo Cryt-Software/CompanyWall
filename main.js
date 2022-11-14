@@ -89,8 +89,8 @@ Apify.main(async () => {
                 userData: { label },
             } = context.request;
 
-            page.waitForNetwork({waitUntil: 'domcontentloaded', timeout: 60000} )
-            page.setDefaultNavigationTimeout(60000);
+            await context.page.waitForNetwork({waitUntil: 'domcontentloaded', timeout: 60000} )
+            // await context.page.setDefaultNavigationTimeout(60000);
             
             // console.log("Page opened.", { label, url });
             // console.log("Proxy details")
