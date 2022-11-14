@@ -1,5 +1,7 @@
 const Apify = require("apify");
-const { setMaxListeners } = require("lighthouse/lighthouse-core/lib/network-recorder.js");
+const {
+    setMaxListeners,
+} = require("lighthouse/lighthouse-core/lib/network-recorder.js");
 var request = require("request");
 const {
     utils: { log },
@@ -73,16 +75,62 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         logInfo("Not register page");
     }
 
-    let contactDetails = await getContactDetails(page);
-    let contactDetails = await handleContactDetailsWithRequest(page)
+    // let contactDetails = await getContactDetails(page);
+    let contactDetails = await handleContactDetailsWithRequest(page);
 
-    let businessName = await handleBusinessName(page);
-    let businessCoreDetails = await handleMainBusinessDetails(page);
-    let directors = await handleDirectors(page);
-    let businessDetails = await handleBusinessDetails(page);
-    let businessfinancials = await getFinancialData(page);
-    let businessAddress = await handleBusinessAddress(page);
-    let businessSummary = await handleBusinessSummary(page);
+    let businessName = {};
+    try {
+        businessName = await handleBusinessName(page);
+    } catch (e) {
+        console.error(e);
+        console.error("Business Name error");
+        businessName = {};
+    }
+
+    let businessCoreDetails = {};
+    try {
+        businessCoreDetails = await handleMainBusinessDetails(page);
+    } catch (e) {
+        console.error(e);
+        console.error("Could not get business core details");
+    }
+
+    let directors = {};
+    try {
+        directors = await handleDirectors(page);
+    } catch (e) {
+        console.error(e);
+        console.error("could not get directors error");
+    }
+
+    let businessDetails = {};
+    try {
+        businessDetails = await handleBusinessDetails(page);
+    } catch (e) {
+        console.error(e);
+        console.error("Error getting data in Business details handler");
+    }
+    let businessfinancials = {};
+    try {
+        businessfinancials = await getFinancialData(page);
+    } catch (e) {
+        console.error(e);
+        console.error("Could not get business financials");
+    }
+    let businessAddress = {};
+    try {
+        businessAddress = await handleBusinessAddress(page);
+    } catch (e) {
+        console.error(e);
+        console.error("business address error");
+    }
+    let businessSummary = {};
+    try {
+        businessSummary = await handleBusinessSummary(page);
+    } catch (e) {
+        console.error(e);
+        console.error("Error getting business summary data");
+    }
 
     if (main.scrapDirectors) {
         for (let i = 0; i < directors.length; i++) {
@@ -831,8 +879,6 @@ async function handleContactDetailsWithRequest(page) {
         `https://www.companywall.hr/Home/GetContact?id=0&idc=81555&type=${type};
 `;
 
-
-
     // web
     let web = await page.evaluate(() => {
         return (
@@ -874,8 +920,8 @@ async function handleContactDetailsWithRequest(page) {
                 // Retrieve its body as ReadableStream
                 .then((response) => response.text())
                 .then((text) => {
-                    text = text.replace(/<.*itemprop='email'>/i, "")
-                    text = text.replace("</a>", "")
+                    text = text.replace(/<.*itemprop='email'>/i, "");
+                    text = text.replace("</a>", "");
                     console.log(text);
                     // …
                 })
@@ -887,10 +933,9 @@ async function handleContactDetailsWithRequest(page) {
         telephone: tel,
         web: web,
     };
-    console.log('logging NEW FROM contact details scraper')
+    console.log("logging NEW FROM contact details scraper");
     logInfo(result);
     return result;
-
 }
 
 //This gets the directors and their links to their specific pages
