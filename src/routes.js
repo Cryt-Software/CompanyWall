@@ -4,9 +4,13 @@ const Apify = require("apify");
 // var request = require("request");
 const {
     utils: { log },
-    Actor
+    Actor,
+    pushData
 } = Apify;
 const main = require("../main.js");
+
+// const { Dataset } = require('crawlee');
+
 
 const DEBUG = true;
 const DEBUG_LEVEL = 3;
@@ -530,7 +534,8 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         // return returnObj;
 
         await main.mongo.insert(result);
-        await Actor.pushData(result)
+        await pushData(result)
+
 
         return result;
     }

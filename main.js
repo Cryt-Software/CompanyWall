@@ -11,6 +11,7 @@ const { RequestQueue } = require("apify");
 DEBUG = true;
 const {
     utils: { log },
+    pushData
 } = Apify;
 const DEBUG_LEVEL = true;
 const local_dev = false
