@@ -1,7 +1,10 @@
 const Apify = require("apify");
+// import { Actor } from 'apify';
+
 // var request = require("request");
 const {
     utils: { log },
+    Actor
 } = Apify;
 const main = require("../main.js");
 
@@ -52,6 +55,7 @@ exports.handleDirector = async ({ request, page, session }) => {
 
     await main.mongo.insert(returnObj);
 
+
     return returnObj;
 };
 
@@ -68,6 +72,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         return; // this needs to be use new proxy
     } else {
         logInfo("Not register page");
+    
         // }
 
         // // let contactDetails = await getContactDetails(page);
@@ -254,6 +259,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                     email = email.replace(/<.*itemprop='email'>/i, "");
                     test = true;
                 }
+                
 
                 if (idc) {
                     web = await fetch(
@@ -524,6 +530,8 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         // return returnObj;
 
         await main.mongo.insert(result);
+        await Actor.pushData(result)
+
         return result;
     }
 
