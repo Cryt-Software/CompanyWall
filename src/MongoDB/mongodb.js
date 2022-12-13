@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 
 const MONGOURL = "mongodb+srv://Cryt:Skyrimrocks123@cryt.dvj2t.mongodb.net/?retryWrites=true&w=majority";
-const MONGODB = 'test'
+const MONGODB = 'full'
 
 
 
@@ -21,7 +21,7 @@ class Mongo {
     connect() {
 
         this.client = new MongoClient(MONGOURL);
-        const database = this.client.db('test');
+        const database = this.client.db('full');
         this.collection = database.collection('CompanyWall');
     } 
 
