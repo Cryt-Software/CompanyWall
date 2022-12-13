@@ -152,8 +152,13 @@ Apify.main(async () => {
                     logInfo("sitemap");
                     return handleSitemap(context, requestQueue);
                 default:
+                    if(input.sitemap) {
+                        return handleSitemap(context, requestQueue);
+                    } else{
                     return handleStart(context, requestQueue);
-            }
+                    }
+                }
+
         },
         handleFailedRequestFunction(HandleFailedRequest) {
             console.error(
@@ -208,13 +213,15 @@ async function handleInput(input, requestQueue) {
         //         regex: ".*",
         //     },
         // ]);
-        let newArray = []
-        for(let i = 0; i > startUrls.length; i++){
-            newArray.push({url: startUrls[i] , userData: { label: "SITEMAP" }})
-        }
-         return await Apify.openRequestList("start-urls", newArray );
-        logInfo(requestList);
-        return requestList;
+        // let newArray = []
+        // for(let i = 0; i > startUrls.length; i++){
+        //     newArray.push({url: startUrls[i] , userData: { label: "SITEMAP" }})
+        // }
+        // console.log(newArray)
+        //  return await Apify.openRequestList("start-urls", newArray );
+        // logInfo(requestList);
+        // return requestList;
+        return await Apify.openRequestList("start-urls", startUrls);
         //         return await Apify.openRequestList('sitemap', [
         //             {url: startUrls[0].url, userData: {label: "SITEMAP"}}
         //         ])
