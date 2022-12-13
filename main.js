@@ -214,7 +214,7 @@ async function handleInput(input, requestQueue) {
         //     },
         // ]);
         // let newArray = []
-        // for(let i = 0; i > startUrls.length; i++){
+        // for(let i = 0; i < startUrls.length; i++){
         //     newArray.push({url: startUrls[i] , userData: { label: "SITEMAP" }})
         // }
         // console.log(newArray)

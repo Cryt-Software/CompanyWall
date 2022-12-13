@@ -78,7 +78,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         // return; // this needs to be use new proxy
     } else {
         logInfo("Not register page");
-
+        console.log('About get data')
         let result = await page.evaluate(async () => {
             return await new Promise(async (resolve) => {
                 let errors = [];
@@ -543,8 +543,9 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                 resolve(final_result)
             });
         });
-        console.log("safasdfasdf");
-        console.log(result);
+        logInfo('got info from browser')
+        // console.log("safasdfasdf");
+        // console.log(result);
 
         main.stats.database_added = main.stats.database_added + 1;
 
@@ -599,19 +600,30 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         console.log(result.length)
         console.log('the result is above fuck off')
 
+
+    let newArray = []
+        for(let i = 0; i < result.length; i++){
+            newArray.push({url: result[i] , userData: { label: "DETAIL" }})
+        }
+        console.log(newArray)
+
+        await Apify.openRequestList("sitemapURLS", newArray );
+
+
         // await requestQueue.addRequests()
         // const requestList = await Apify.openRequestList()
-        for (let i = 0; i < result.length; i++) {
-            // const url = [i];
-            // console.log(result[i])
+        // for (let i = 0; i < result.length; i++) {
+        //     // const url = [i];
+        //     // console.log(result[i])
 
-            // await Apify.pushData({"url":result[i]})
-            // logInfo(url)
-            await requestQueue.addRequest({
-                url: result[i],
-                userData: { label: "DETAIL" },
-            });
-        }
+        //     // await Apify.pushData({"url":result[i]})
+        //     // logInfo(url)
+            
+        //     await requestQueue.addRequest({
+        //         url: result[i],
+        //         userData: { label: "DETAIL" },
+        //     });
+        // }
     };
 
     //this gets the stats of the directory such as how many companies he as been part of etc
