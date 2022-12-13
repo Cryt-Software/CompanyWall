@@ -612,7 +612,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
             },{ forefront: true });
         }
 
-        Apify.pushData(result)
+        // Apify.pushData(result)
         // console.log(newArray)
 
     //   await Apify.openRequestList(page.url, newArray )
