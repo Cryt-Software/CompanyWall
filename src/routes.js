@@ -1793,7 +1793,7 @@ works almost the same for related companies
             businessDataSummary,
         });
     }
-};
+// };
 
 
 // Run in browser
