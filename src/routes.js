@@ -76,110 +76,6 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         return; // this needs to be use new proxy
     } else {
         logInfo("Not register page");
-    
-        // }
-
-        // // let contactDetails = await getContactDetails(page);
-        // let contactDetails = await handleContactDetailsWithRequest(page);
-
-        // let businessName = {};
-        // try {
-        //     businessName = await handleBusinessName(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("Business Name error");
-        //     businessName = {};
-        // }
-
-        // let businessCoreDetails = {};
-        // try {
-        //     businessCoreDetails = await handleMainBusinessDetails(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("Could not get business core details");
-        // }
-
-        // let directors = {};
-        // try {
-        //     directors = await handleDirectors(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("could not get directors error");
-        // }
-
-        // let businessDetails = {};
-        // try {
-        //     businessDetails = await handleBusinessDetails(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("Error getting data in Business details handler");
-        // }
-        // let businessfinancials = {};
-        // try {
-        //     businessfinancials = await getFinancialData(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("Could not get business financials");
-        // }
-        // let businessAddress = {};
-        // try {
-        //     businessAddress = await handleBusinessAddress(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("business address error");
-        // }
-        // let businessSummary = {};
-        // try {
-        //     businessSummary = await handleBusinessSummary(page);
-        // } catch (e) {
-        //     console.error(e);
-        //     console.error("Error getting business summary data");
-        // }
-
-        // if (main.scrapDirectors) {
-        //     for (let i = 0; i < directors.length; i++) {
-        //         //TODO MAKE SURE THAT WE ARE NOT SCRAPING THE SAME DIRECTORS OVER AND OVER AGAIN CHECK THEIR NAME
-        //         // MAKE A LIST OF ALL THE OBJECTS WITH UNIQUE NAMES
-        //         const name = directors[i].fullName;
-        //         const link = directors[i].directorLink;
-
-        //         requestQueue.addRequest({
-        //             url: link,
-        //             userData: { label: "DIRECTOR_PAST_COMPANIES", name: name },
-        //         });
-        //     }
-        // }
-
-        // // await page.waitFor(200);
-        // // List scrap a director based on link given
-
-        // let returnObj = {
-        //     Name: businessName,
-        //     Address: businessAddress,
-        //     Directors: directors,
-        //     BasicInformation: businessDetails,
-        //     Financials: businessfinancials,
-        //     AuditorBrief: businessSummary,
-        //     OIB: businessCoreDetails.OIB,
-        //     MBS: businessCoreDetails.MBS,
-        //     RegisterDate: businessCoreDetails.dataOfRegister,
-        //     DateScraped: dateOfScrap.toString(),
-        //     TimeToScrap: new Date() - dateOfScrap,
-        //     Type: "company business overview",
-        //     contactDetails: contactDetails,
-
-        //     email: contactDetails.email,
-        //     website: contactDetails.web,
-        //     telephone: contactDetails.telephone,
-
-        //     Url: page.url(),
-        // };
-        // logInfo(
-        //     "-----------------------------Full object coming ---------------------------"
-        // );
-
-        // let result = await page.evaluate(evaluatejsCode);
-        // console.log(result);
 
         let result = await page.evaluate(async () => {
             return await new Promise(async (resolve) => {
@@ -432,6 +328,130 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                 console.log("business summary data coming");
                 console.log(businessDataSummary);
                 console.log("buisness summary end");
+
+
+                // -----    finanical data ----
+                 const tableXpath =
+            '//section/header/div/h3[contains(text(),"Financijski sažetak")]/parent::div/parent::header/parent::section//table[@class="table table-striped no-border table-sm company-summary-table"]';
+        const tableYearsHeadersXpath =
+            '//section/header/div/h3[contains(text(),"Financijski sažetak")]/parent::div/parent::header/parent::section//table[@class="table table-striped no-border table-sm company-summary-table"]/thead';
+        const tablesRowDataXpath =
+            '//section/header/div/h3[contains(text(),"Financijski sažetak")]/parent::div/parent::header/parent::section//table[@class="table table-striped no-border table-sm company-summary-table"]/tbody/tr';
+
+        let getRowNameValue = (rowIndex) => {
+            return (
+                tablesRowDataXpath + `[${rowIndex}]` + '/td[@data-title=" "]'
+            );
+        };
+
+        let getRowValue2019 = (rowIndex) => {
+            return (
+                tablesRowDataXpath + `[${rowIndex}]` + '/td[@data-title="2019"]'
+            );
+        };
+
+        let getRowValue2020 = (rowIndex) => {
+            return (
+                tablesRowDataXpath + `[${rowIndex}]` + '/td[@data-title="2020"]'
+            );
+        };
+
+        let getRowValue2021 = (rowIndex) => {
+            return (
+                tablesRowDataXpath + `[${rowIndex}]` + '/td[@data-title="2021"]'
+            );
+        };
+
+        // check if exists
+        let table = await $x(tableXpath);
+        if (table.length == 0) {
+            console.log("No Fincancial Data");
+        } else {
+            console.log("There is fincancial data");
+            // get row length
+            let rows = await $x(tablesRowDataXpath);
+            let rowsLength = rows.length;
+
+            // get data
+            let rowDataName = [];
+            let row2019 = [];
+            let row2020 = [];
+            let row2021 = [];
+
+            for (let i = 1; i < rowsLength + 1; i++) {
+                rowDataName.push(await helperGetInnerText(getRowNameValue(i)));
+
+                row2019.push(await helperGetInnerText(getRowValue2019(i)));
+
+                row2020.push(await helperGetInnerText(getRowValue2020(i)));
+
+                row2021.push(await helperGetInnerText(getRowValue2021(i)));
+            }
+
+            let result2019 = [];
+            let result2020 = [];
+            let result2021 = [];
+            let obj = {}
+            for (let index = 0; index < rowDataName.length; index++) {
+                let rowLabel = rowDataName[index];
+                let row2019Single = row2019[index];
+                let row2020Single = row2020[index];
+                let row2021Single = row2021[index];
+
+                result2019.push({ [rowLabel]: row2019Single });
+                result2020.push({ [rowLabel]: row2020Single });
+                result2021.push({ [rowLabel]: row2021Single });
+                switch (index){
+                    case 0:
+                    obj["Revenue 2019"] = row2019Single
+                    obj["Revenue 2020"] = row2020Single
+                    obj["Revenue 2021"] = row2021Single
+                    case 1:
+                    obj["Total expenditures 2019"] = row2019Single
+                    obj["Total expenditures 2020"] = row2020Single
+                    obj["Total expenditures 2021"] = row2021Single
+                    case 2:
+                    obj["Result of business 2019"] = row2019Single
+                    obj["Result of business 2020"] = row2020Single
+                    obj["Result of business 2021"] = row2021Single
+                         case 3:
+     obj["Obligations 2019"] = row2019Single
+     obj["Obligations 2020"] = row2020Single
+     obj["Obligations 2021"] = row2021Single
+          case 4:
+     obj["Trade receivables 2019"] = row2019Single
+     obj["Trade receivables 2020"] = row2020Single
+     obj["Trade receivables 2021"] = row2021Single
+          case 5:
+     obj["Current ratio 2019"] = row2019Single
+     obj["Current ratio 2020"] = row2020Single
+     obj["Current ratio 2021"] = row2021Single
+          case 6:
+     obj["Claims collection days 2019"] = row2019Single
+     obj["Claims collection days 2020"] = row2020Single
+     obj["Claims collection days 2021"] = row2021Single
+          case 7:
+     obj["Average gross salary per employee 2019"] = row2019Single
+     obj["Average gross salary per employee 2020"] = row2020Single
+     obj["Average gross salary per employee 2021"] = row2021Single
+
+
+
+                }
+               
+            }
+
+            // financialData = {
+            //     2019: result2019,
+            //     2020: result2020,
+            //     2021: result2021,
+            // };
+            financialData = obj
+            console.log(financialData);
+            console.log(obj)
+            
+            // return result;
+        }  
                 
                 try {
                      NKD = businessData.NKD;
@@ -484,10 +504,11 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                 let flat_directors = flattenObject(directors)
                 let flat_businessData = flattenObject_single_name(businessData)
 
+                // let totalIncome = 
+
                 // resolve({
                 let final_result = {
                     idc: idc,
-                    test,
                     email,
                     phone,
                     telephone,
@@ -504,7 +525,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                     directors_fullname_3,
                     directors_role_3,
                     businessData,
-                    financialData,
+                    // financialData,
                     fullAddress,
                     streetAddress,
                     postalCode,
@@ -515,7 +536,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                     // flat_directors
                 };
 
-                final_result = {...final_result, ...flatten_business_summary, ...flat_directors, ...flat_businessData}
+                final_result = {...final_result, ...flatten_business_summary, ...flat_directors, ...flat_businessData, ...financialData}
 
                 resolve(final_result)
             });
@@ -1624,19 +1645,19 @@ works almost the same for related companies
             let row2021 = [];
 
             for (let i = 1; i < rowsLength + 1; i++) {
-                rowDataName.push(helperGetInnerText(getRowNameValue(i)));
+                rowDataName.push(await helperGetInnerText(getRowNameValue(i)));
 
-                row2019.push(helperGetInnerText(getRowValue2019(i)));
+                row2019.push(await helperGetInnerText(getRowValue2019(i)));
 
-                row2020.push(helperGetInnerText(getRowValue2020(i)));
+                row2020.push(await helperGetInnerText(getRowValue2020(i)));
 
-                row2021.push(helperGetInnerText(getRowValue2021(i)));
+                row2021.push(await helperGetInnerText(getRowValue2021(i)));
             }
 
             let result2019 = [];
             let result2020 = [];
             let result2021 = [];
-
+            let obj = {}
             for (let index = 0; index < rowDataName.length; index++) {
                 let rowLabel = rowDataName[index];
                 let row2019Single = row2019[index];
@@ -1646,13 +1667,55 @@ works almost the same for related companies
                 result2019.push({ [rowLabel]: row2019Single });
                 result2020.push({ [rowLabel]: row2020Single });
                 result2021.push({ [rowLabel]: row2021Single });
+                switch (index){
+                    case 0:
+                    obj["Revenue 2019"] = row2019Single
+                    obj["Revenue 2020"] = row2020Single
+                    obj["Revenue 2021"] = row2021Single
+                    case 1:
+                    obj["Total expenditures 2019"] = row2019Single
+                    obj["Total expenditures 2020"] = row2020Single
+                    obj["Total expenditures 2021"] = row2021Single
+                    case 2:
+                    obj["Result of business 2019"] = row2019Single
+                    obj["Result of business 2020"] = row2020Single
+                    obj["Result of business 2021"] = row2021Single
+                         case 3:
+     obj["Obligations 2019"] = row2019Single
+     obj["Obligations 2020"] = row2020Single
+     obj["Obligations 2021"] = row2021Single
+          case 4:
+     obj["Trade receivables 2019"] = row2019Single
+     obj["Trade receivables 2020"] = row2020Single
+     obj["Trade receivables 2021"] = row2021Single
+          case 5:
+     obj["Current ratio 2019"] = row2019Single
+     obj["Current ratio 2020"] = row2020Single
+     obj["Current ratio 2021"] = row2021Single
+          case 6:
+     obj["Claims collection days 2019"] = row2019Single
+     obj["Claims collection days 2020"] = row2020Single
+     obj["Claims collection days 2021"] = row2021Single
+          case 7:
+     obj["Average gross salary per employee 2019"] = row2019Single
+     obj["Average gross salary per employee 2020"] = row2020Single
+     obj["Average gross salary per employee 2021"] = row2021Single
+
+
+
+                }
+               
             }
-            financialData = {
-                2019: result2019,
-                2020: result2020,
-                2021: result2021,
-            };
+
+            // financialData = {
+            //     2019: result2019,
+            //     2020: result2020,
+            //     2021: result2021,
+            // };
+            financialData = obj
             console.log(financialData);
+            console.log(obj)
+            
             // return result;
         }
 
@@ -1725,6 +1788,8 @@ works almost the same for related companies
     }
 };
 
+
+// Run in browser
 async function dirTempEve() {
     let errors = [];
     const url = window.location.href;
