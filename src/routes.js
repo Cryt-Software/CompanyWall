@@ -575,7 +575,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     };
 
     exports.handleSitemap = async (
-        { request, page, session, enqueueRequest },
+        { request, page, session },
         requestQueue
     ) => {
         
@@ -605,7 +605,11 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     let newArray = []
         for(let i = 0; i < result.length; i++){
             // newArray.push({url: result[i] , userData: { label: "DETAIL" }})
-            await enqueueRequest({url: result[i] , userData: { label: "DETAIL" }}, { forefront: true })
+            // await enqueueRequest({url: result[i] , userData: { label: "DETAIL" }}, { forefront: true })
+                        await requestQueue.addRequest({
+                url: result[i],
+                userData: { label: "DETAIL" },
+            },{ forefront: true });
         }
 
         Apify.pushData(result)
