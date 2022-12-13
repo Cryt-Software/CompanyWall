@@ -602,10 +602,10 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         // console.log('the result is above fuck off')
 
 
-    // let newArray = []
-    //     for(let i = 0; i < result.length; i++){
-    //         // newArray.push({url: result[i] , userData: { label: "DETAIL" }})
-    //         await enqueueRequest({url: result[i] , userData: { label: "DETAIL" }})
+    let newArray = []
+        for(let i = 0; i < result.length; i++){
+            // newArray.push({url: result[i] , userData: { label: "DETAIL" }})
+            await enqueueRequest({url: result[i] , userData: { label: "DETAIL" }}, { forefront: true })
         }
 
         Apify.pushData(result)
