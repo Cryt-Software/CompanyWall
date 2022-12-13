@@ -93,13 +93,13 @@ Apify.main(async () => {
         sessionPoolOptions: {
             maxPoolSize: 100,
         },
-        preNavigationHooks: [
-            async (crawlingContext, gotoOptions) => {
-                // const { page } = crawlingContext;
-                // await page.evaluate((attr) => { window.foo = attr; }, 'bar');
-                gotoOptions.waitUntil = 'networkidle2'
-            },
-        ],
+        // preNavigationHooks: [
+        //     async (crawlingContext, gotoOptions) => {
+        //         // const { page } = crawlingContext;
+        //         // await page.evaluate((attr) => { window.foo = attr; }, 'bar');
+        //         gotoOptions.waitUntil = 'networkidle2'
+        //     },
+        // ],
         persistCookiesPerSession: true,
         maxConcurrency: 5,
         proxyConfiguration,
