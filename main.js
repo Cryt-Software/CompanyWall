@@ -59,7 +59,8 @@ Apify.main(async () => {
     if(local_dev){
 
     requestList =  await Apify.openRequestList("start-urls", [
-       
+       "https://www.companywall.hr/tvrtka/autopraona-zuzic-ivan-zuzic-velika-gorica-kraljice-katarine-3/MM7dfAfq",
+        "https://www.companywall.hr/tvrtka/comitium-doo/MMgbpKC"
 
         ]); // works
     // let proxyConfig = {
@@ -207,12 +208,18 @@ async function handleInput(input, requestQueue) {
                 regex: ".*",
             },
         ]);
+        let newArray = []
+        for(let i = 0; i > startUrls.length; i++){
+            newArray.push({url: startUrls[i] , userData: { label: "SITEMAP" }})
+        }
+         return await Apify.openRequestList("start-urls", newArray );
         logInfo(requestList);
         return requestList;
         //         return await Apify.openRequestList('sitemap', [
         //             {url: startUrls[0].url, userData: {label: "SITEMAP"}}
         //         ])
         //SITEMAP
+
     } else if (OIB) {
         // scraping OIB for search
         //TODO not implmeneted

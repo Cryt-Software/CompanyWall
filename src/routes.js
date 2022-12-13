@@ -562,6 +562,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
 
         return result;
     }
+}
 
     exports.handleList = async ({ request, page }) => {
         // Handle pagination
@@ -584,26 +585,30 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
             logInfo("Not register page");
         }
 
-        // const link = page.querySelectorAll("urlset > url > loc");
-        // logInfo('link info coming')
-        // logInfo(typeof link)
-        // logInfo(link.length)
+        let result =await page.evaluate(() => {
+            // alert();
+            let result = document.getElementsByTagName("loc")
+            let urls = []
+            for(let i = 0; i < result.length; i++){
+                urls.push(result[i].innerHTML)
+            }
+            return urls;
 
-        // for (let i = 0; i < link.length; i++) {
-        //     const url = link[i];
-        //     logInfo(url)
-        //     requestQueue.addRequest({
-        //         url: url,
-        //         userData: { label: "DETAIL" },
-        //     });
-        // }
-        logInfo("asdfasdf");
-        logInfo("about to scrap all links");
-        await Apify.utils.enqueueLinks({
-            page,
-            requestQueue,
-            pseudoUrls: [".*"],
-        });
+        })
+        console.log('scraped  a sitemap')
+        console.log(result.length)
+        console.log('the result is above fuck off')
+        for (let i = 0; i < result.length; i++) {
+            // const url = [i];
+            // console.log(result[i])
+
+            // await Apify.pushData({"url":result[i]})
+            // logInfo(url)
+            requestQueue.addRequest({
+                url: url,
+                // userData: { label: "DETAIL" },
+            });
+        }
     };
 
     //this gets the stats of the directory such as how many companies he as been part of etc
