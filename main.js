@@ -107,20 +107,21 @@ Apify.main(async () => {
         launchContext: {
             // Chrome with stealth should work for most websites.
             // If it doesn't, feel free to remove this.
-            useChrome: true,
-            stealth: true,
-            launchOptions: {
-                // headless: true,
-                waitForNetwork: "networkidle0",
-                waitUntil: 'networkidle0',
-            },
+            // useChrome: true,
+            // stealth: true,
+            // launchOptions: {
+            //     headless: true,
+            //     waitForNetwork: "networkidle0",
+            //     waitUntil: 'networkidle0',
+            // },
         },
         browserPoolOptions: {
+            maxOpenPagesPerBrowser: 5,
             // This allows browser to be more effective against anti-scraping protections.
             // If you are having performance issues try turning this off.
             // useFingerprints: true,
         },
-        navigationTimeoutSecs: 30000,
+        navigationTimeoutSecs: 3000,
 
         handlePageFunction: async (context) => {
             const {
@@ -159,7 +160,9 @@ Apify.main(async () => {
             );
             try {
                 console.error(HandleFailedRequest.error);
+                HandleFailedRequest.session.isBlocked()
                 HandleFailedRequest.session.retire();
+                HandleFailedRequest.session.markBad()
             } catch (e) {
                 console.error(
                     "ERROR CANT ACCESS SESSION FROM HANDLE FAILED REQUEST FUNCTION"

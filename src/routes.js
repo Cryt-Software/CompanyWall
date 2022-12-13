@@ -72,8 +72,10 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     if (await checkForRegisterPage(page)) {
         main.stats.register_page_hit = main.stats.register_page_hit + 1;
         console.error("it is register page");
+        session.markBad();
         session.retire();
-        return; // this needs to be use new proxy
+        throw Error('register page')
+        // return; // this needs to be use new proxy
     } else {
         logInfo("Not register page");
 
