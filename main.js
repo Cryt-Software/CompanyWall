@@ -140,7 +140,7 @@ Apify.main(async () => {
             // logInfo('sessions')
             // logInfo(context.session.sessionPool.config)
             // logInfo(context.session)
-            // logInfo('end of session data')
+          
             switch (label) {
                 case "LIST":
                     return handleList(context, requestQueue);

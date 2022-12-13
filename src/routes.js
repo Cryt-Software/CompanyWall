@@ -575,9 +575,10 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
     };
 
     exports.handleSitemap = async (
-        { request, page, session },
+        { request, page, session, enqueueRequest },
         requestQueue
     ) => {
+        
         if (await checkForRegisterPage(page)) {
             console.error("it is register page");
             session.retire();
@@ -601,14 +602,18 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         // console.log('the result is above fuck off')
 
 
-    let newArray = []
-        for(let i = 0; i < result.length; i++){
-            newArray.push({url: result[i] , userData: { label: "DETAIL" }})
+    // let newArray = []
+    //     for(let i = 0; i < result.length; i++){
+    //         // newArray.push({url: result[i] , userData: { label: "DETAIL" }})
+    //         await enqueueRequest({url: result[i] , userData: { label: "DETAIL" }})
         }
-        console.log(newArray)
 
-        await (await Apify.openRequestList("sitemapURLS", newArray )).initialize;
+        Apify.pushData(result)
+        // console.log(newArray)
 
+    //   await Apify.openRequestList(page.url, newArray )
+        
+       
 
         // await requestQueue.addRequests()
         // const requestList = await Apify.openRequestList()
