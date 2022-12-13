@@ -78,7 +78,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         // return; // this needs to be use new proxy
     } else {
         logInfo("Not register page");
-        console.log('About get data')
+        // console.log('About get data')
         let result = await page.evaluate(async () => {
             return await new Promise(async (resolve) => {
                 let errors = [];
@@ -543,7 +543,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
                 resolve(final_result)
             });
         });
-        logInfo('got info from browser')
+        // logInfo('got info from browser')
         // console.log("safasdfasdf");
         // console.log(result);
 
@@ -596,9 +596,9 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
             return urls;
 
         })
-        console.log('scraped  a sitemap')
-        console.log(result.length)
-        console.log('the result is above fuck off')
+        // console.log('scraped  a sitemap')
+        // console.log(result.length)
+        // console.log('the result is above fuck off')
 
 
     let newArray = []
@@ -607,7 +607,7 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         }
         console.log(newArray)
 
-        await Apify.openRequestList("sitemapURLS", newArray );
+        await (await Apify.openRequestList("sitemapURLS", newArray )).initialize;
 
 
         // await requestQueue.addRequests()
