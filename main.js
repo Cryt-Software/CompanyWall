@@ -202,12 +202,12 @@ async function handleInput(input, requestQueue) {
         // return await Apify.openRequestList("start-urls", [{url: startUrls, userData: {label: "SITEMAP"}}]);
         logInfo(`---------SITEMAP SCRAPER STARTER ----------------------`);
         logInfo(startUrls);
-        const requestList = await Apify.RequestList.open(null, [
-            {
-                requestsFromUrl: "https://www.brewbound.com/sitemap.xml",
-                regex: ".*",
-            },
-        ]);
+        // const requestList = await Apify.RequestList.open(null, [
+        //     {
+        //         requestsFromUrl: "https://www.brewbound.com/sitemap.xml",
+        //         regex: ".*",
+        //     },
+        // ]);
         let newArray = []
         for(let i = 0; i > startUrls.length; i++){
             newArray.push({url: startUrls[i] , userData: { label: "SITEMAP" }})
