@@ -598,15 +598,18 @@ exports.handleStart = async ({ request, page, session }, requestQueue) => {
         console.log('scraped  a sitemap')
         console.log(result.length)
         console.log('the result is above fuck off')
+
+        // await requestQueue.addRequests()
+        // const requestList = await Apify.openRequestList()
         for (let i = 0; i < result.length; i++) {
             // const url = [i];
             // console.log(result[i])
 
             // await Apify.pushData({"url":result[i]})
             // logInfo(url)
-            requestQueue.addRequest({
-                url: url,
-                // userData: { label: "DETAIL" },
+            await requestQueue.addRequest({
+                url: result[i],
+                userData: { label: "DETAIL" },
             });
         }
     };

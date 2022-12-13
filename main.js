@@ -145,7 +145,7 @@ Apify.main(async () => {
                 case "LIST":
                     return handleList(context, requestQueue);
                 case "DETAIL":
-                    return handleDetail(context, requestQueue);
+                    return handleStart(context, requestQueue);
                 case "DIRECTOR_PAST_COMPANIES":
                     return handleDirector(context, requestQueue);
                 case "SITEMAP":
